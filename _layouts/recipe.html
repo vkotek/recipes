@@ -1,0 +1,44 @@
+---
+layout: recipe
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title | escape }} · Recipes</title>
+    <meta name="description" content="{{ page.description | default: page.title | escape }}">
+    <style>
+      :root { color-scheme: light; --ink: #29251f; --muted: #71695f; --paper: #fffdf8; --line: #e9e1d5; --accent: #85552f; --chip: #f3eadc; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.65 system-ui, sans-serif; }
+      header { padding: 2rem 1.25rem; background: #f3eadc; border-bottom: 1px solid var(--line); }
+      header, main { padding-left: max(1.25rem, calc((100% - 760px) / 2)); padding-right: max(1.25rem, calc((100% - 760px) / 2)); }
+      a { color: var(--accent); }
+      header a { font-weight: 650; }
+      h1 { margin: .75rem 0 .25rem; font-size: clamp(2rem, 6vw, 3rem); line-height: 1.15; }
+      .meta { color: var(--muted); }
+      main { padding-top: 1rem; padding-bottom: 4rem; }
+      .tags { display: flex; flex-wrap: wrap; gap: .45rem; margin: 1rem 0; }
+      .tag { padding: .2rem .65rem; border-radius: 999px; background: var(--chip); color: var(--accent); font-size: .85rem; }
+      .recipe-content h2 { margin-top: 1.8rem; }
+      .recipe-content h3 { margin: 1.4rem 0 .35rem; }
+      .recipe-content ul, .recipe-content ol { padding-left: 1.5rem; }
+      @media print { header { padding: 0 0 1rem; background: white; } header a { display: none; } main { padding: 0; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="{{ '/' | relative_url }}">← All recipes</a>
+      <h1>{{ page.title | escape }}</h1>
+      <p class="meta">
+        {% if page.category %}{{ page.category | escape }}{% endif %}
+        {% if page.servings %}{% if page.category %} · {% endif %}Serves {{ page.servings | escape }}{% endif %}
+        {% if page.prep_time %}{% if page.category or page.servings %} · {% endif %}Prep {{ page.prep_time | escape }}{% endif %}
+        {% if page.cook_time %}{% if page.category or page.servings or page.prep_time %} · {% endif %}Cook {{ page.cook_time | escape }}{% endif %}
+      </p>
+      {% if page.tags %}<div class="tags">{% for tag in page.tags %}<span class="tag">{{ tag | escape }}</span>{% endfor %}</div>{% endif %}
+    </header>
+    <main><div class="recipe-content">{{ content }}</div></main>
+  </body>
+</html>

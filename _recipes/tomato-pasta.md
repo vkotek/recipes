@@ -1,5 +1,12 @@
 ---
 title: Tomato pasta
+description: A quick weeknight pasta with a simple garlic tomato sauce.
+category: Dinner
+tags:
+  - vegetarian
+  - pasta
+  - quick
+servings: 2
 prep_time: 5 minutes
 cook_time: 20 minutes
 ---

@@ -7,106 +7,118 @@ layout: null
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Recipes</title>
-    <meta name="description" content="A simple collection of recipes.">
+    <meta name="description" content="Browse and search a simple collection of recipes.">
     <style>
       :root { color-scheme: light; --ink: #29251f; --muted: #71695f; --paper: #fffdf8; --line: #e9e1d5; --accent: #85552f; --chip: #f3eadc; }
       * { box-sizing: border-box; }
       body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.6 system-ui, sans-serif; }
       header { padding: 3rem 1.25rem 2rem; background: #f3eadc; border-bottom: 1px solid var(--line); }
-      header, main { padding-left: max(1.25rem, calc((100% - 760px) / 2)); padding-right: max(1.25rem, calc((100% - 760px) / 2)); }
+      header, main { padding-left: max(1.25rem, calc((100% - 820px) / 2)); padding-right: max(1.25rem, calc((100% - 820px) / 2)); }
       h1 { margin: 0; font-size: clamp(2.2rem, 7vw, 3.5rem); line-height: 1.1; }
       header p { margin: .75rem 0 0; color: var(--muted); }
       main { padding-top: 1.5rem; padding-bottom: 4rem; }
-      .filters { display: flex; flex-wrap: wrap; gap: .75rem; margin-bottom: 1rem; }
-      .filters input, .filters select { min-height: 2.8rem; padding: .55rem .75rem; border: 1px solid var(--line); border-radius: .5rem; background: white; color: var(--ink); font: inherit; }
-      .filters input { flex: 1 1 16rem; }
-      .filters select { flex: 0 1 12rem; }
-      .filters input:focus, .filters select:focus, .tag:focus-visible { outline: 3px solid #d5ad7f; outline-offset: 2px; }
-      article { padding: 1.5rem 0; border-bottom: 1px solid var(--line); }
-      article h2 { margin: 0 0 .25rem; font-size: 1.7rem; }
+      .filters { display: grid; gap: .75rem; margin-bottom: 1rem; }
+      .filters input { width: 100%; min-height: 2.8rem; padding: .55rem .75rem; border: 1px solid var(--line); border-radius: .5rem; background: white; color: var(--ink); font: inherit; }
+      .filters input:focus, .tag:focus-visible, .recipe-link:focus-visible { outline: 3px solid #d5ad7f; outline-offset: 2px; }
+      .tag-list { display: flex; flex-wrap: wrap; gap: .45rem; }
+      .tag { padding: .25rem .65rem; border: 1px solid var(--line); border-radius: 999px; background: white; color: var(--accent); font: inherit; font-size: .85rem; cursor: pointer; }
+      .tag[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: white; }
       .meta { color: var(--muted); font-size: .9rem; }
-      .tag-list { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0 1rem; }
-      .tag { padding: .2rem .55rem; border: 0; border-radius: 999px; background: var(--chip); color: var(--accent); font: inherit; font-size: .82rem; cursor: pointer; }
-      .recipe-content h3 { margin: 1.2rem 0 .25rem; font-size: 1.05rem; }
-      .recipe-content ul, .recipe-content ol { padding-left: 1.4rem; }
+      .recipe-list { list-style: none; padding: 0; margin: 0; }
+      .recipe-item { padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
+      .recipe-link { display: inline-block; color: var(--ink); text-decoration: none; }
+      .recipe-link:hover h2 { color: var(--accent); text-decoration: underline; }
+      .recipe-item h2 { margin: 0; font-size: 1.45rem; }
+      .recipe-item p { margin: .35rem 0 .65rem; }
+      .recipe-item .tag-list { margin-top: .65rem; }
+      .recipe-item .tag { padding: .12rem .5rem; font-size: .78rem; cursor: pointer; }
       .empty { color: var(--muted); }
-      @media (max-width: 520px) { .filters { flex-direction: column; } .filters input, .filters select { flex: auto; width: 100%; } }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+      @media (max-width: 520px) { header { padding-top: 2.25rem; } }
     </style>
   </head>
   <body>
     <header>
       <h1>Recipes</h1>
-      <p>A small collection of things worth cooking again.</p>
+      <p>Find something good to cook.</p>
     </header>
     <main>
       {% assign recipes = site.recipes | sort: 'title' %}
-      {% assign categories = recipes | map: 'category' | compact | uniq | sort %}
-      {% if recipes.size > 0 %}
-        <section class="filters" aria-label="Find recipes">
-          <label class="sr-only" for="recipe-search">Search recipes</label>
-          <input id="recipe-search" type="search" placeholder="Search recipes, ingredients, or tags…" autocomplete="off">
-          <label class="sr-only" for="category-filter">Filter by category</label>
-          <select id="category-filter">
-            <option value="">All categories</option>
-            {% for category in categories %}<option value="{{ category | escape }}">{{ category | escape }}</option>{% endfor %}
-          </select>
-        </section>
-        <p id="result-count" class="meta" aria-live="polite"></p>
-      {% endif %}
+      {% assign all_tags = recipes | map: 'tags' | join: ',' | split: ',' | uniq | sort_natural %}
       {% if recipes.size == 0 %}
         <p class="empty">No recipes yet. Add a Markdown file to <code>_recipes/</code>.</p>
       {% else %}
-        {% for recipe in recipes %}
-          <article class="recipe" data-category="{{ recipe.category | escape }}">
-            <h2>{{ recipe.title | escape }}</h2>
-            {% if recipe.category or recipe.prep_time or recipe.cook_time %}
+        <section class="filters" aria-label="Filter recipes">
+          <label class="sr-only" for="recipe-search">Search recipes</label>
+          <input id="recipe-search" type="search" placeholder="Search recipes…" autocomplete="off">
+          {% if all_tags.size > 0 %}
+            <div class="tag-list" aria-label="Filter by tags">
+              {% for tag in all_tags %}<button class="tag filter-tag" type="button" data-tag="{{ tag | strip | escape }}" aria-pressed="false">{{ tag | strip | escape }}</button>{% endfor %}
+            </div>
+          {% endif %}
+        </section>
+        <p id="result-count" class="meta" aria-live="polite"></p>
+        <ul class="recipe-list">
+          {% for recipe in recipes %}
+            {% assign description = recipe.description | default: recipe.excerpt | strip_html | strip_newlines | strip %}
+            {% assign searchable = recipe.title | append: ' ' | append: recipe.category | append: ' ' | append: recipe.tags | join: ' ' | append: ' ' | append: description | downcase %}
+            <li class="recipe-item" data-search="{{ searchable | escape }}" data-tags="{{ recipe.tags | join: '|' | downcase | escape }}">
+              <a class="recipe-link" href="{{ recipe.url | relative_url }}"><h2>{{ recipe.title | escape }}</h2></a>
               <p class="meta">
                 {% if recipe.category %}{{ recipe.category | escape }}{% endif %}
-                {% if recipe.prep_time or recipe.cook_time %}{% if recipe.category %} · {% endif %}{% endif %}
-                {% if recipe.prep_time %}Prep: {{ recipe.prep_time | escape }}{% endif %}
-                {% if recipe.prep_time and recipe.cook_time %} · {% endif %}
-                {% if recipe.cook_time %}Cook: {{ recipe.cook_time | escape }}{% endif %}
+                {% if recipe.servings %}{% if recipe.category %} · {% endif %}Serves {{ recipe.servings | escape }}{% endif %}
+                {% if recipe.prep_time %}{% if recipe.category or recipe.servings %} · {% endif %}Prep {{ recipe.prep_time | escape }}{% endif %}
+                {% if recipe.cook_time %}{% if recipe.category or recipe.servings or recipe.prep_time %} · {% endif %}Cook {{ recipe.cook_time | escape }}{% endif %}
               </p>
-            {% endif %}
-            {% if recipe.tags %}
-              <div class="tag-list" aria-label="Recipe tags">
-                {% for tag in recipe.tags %}<button class="tag" type="button" data-tag="{{ tag | escape }}">{{ tag | escape }}</button>{% endfor %}
-              </div>
-            {% endif %}
-            <div class="recipe-content">{{ recipe.content }}</div>
-          </article>
-        {% endfor %}
-        <p id="no-results" class="empty" hidden>No recipes match your search.</p>
+              <p>{{ description }}</p>
+              {% if recipe.tags %}
+                <div class="tag-list" aria-label="Recipe tags">
+                  {% for tag in recipe.tags %}<button class="tag recipe-tag" type="button" data-tag="{{ tag | escape }}" aria-label="Filter by {{ tag | escape }}">{{ tag | escape }}</button>{% endfor %}
+                </div>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        <p id="no-results" class="empty" hidden>No recipes match those filters.</p>
         <script>
           const searchInput = document.getElementById('recipe-search');
-          const categoryFilter = document.getElementById('category-filter');
-          const recipeCards = [...document.querySelectorAll('.recipe')];
+          const recipes = [...document.querySelectorAll('.recipe-item')];
+          const filterTags = [...document.querySelectorAll('.filter-tag')];
           const resultCount = document.getElementById('result-count');
           const noResults = document.getElementById('no-results');
+          const selectedTags = new Set();
 
           function filterRecipes() {
             const query = searchInput.value.trim().toLocaleLowerCase();
-            const category = categoryFilter.value;
             let visible = 0;
-            recipeCards.forEach((card) => {
-              const matches = card.textContent.toLocaleLowerCase().includes(query)
-                && (!category || card.dataset.category === category);
-              card.hidden = !matches;
-              if (matches) visible += 1;
+            recipes.forEach((recipe) => {
+              const tags = recipe.dataset.tags.toLocaleLowerCase().split('|').filter(Boolean);
+              const matchesSearch = recipe.dataset.search.includes(query);
+              const matchesTags = [...selectedTags].every((tag) => tags.includes(tag.toLocaleLowerCase()));
+              recipe.hidden = !(matchesSearch && matchesTags);
+              if (!recipe.hidden) visible += 1;
             });
-            resultCount.textContent = `Showing ${visible} of ${recipeCards.length} recipes`;
+            resultCount.textContent = `Showing ${visible} of ${recipes.length} recipes`;
             noResults.hidden = visible !== 0;
           }
 
-          searchInput.addEventListener('input', filterRecipes);
-          categoryFilter.addEventListener('change', filterRecipes);
-          document.querySelectorAll('.tag').forEach((tag) => {
-            tag.addEventListener('click', () => {
-              searchInput.value = tag.dataset.tag;
+          filterTags.forEach((button) => {
+            button.addEventListener('click', () => {
+              const tag = button.dataset.tag;
+              if (selectedTags.has(tag)) selectedTags.delete(tag);
+              else selectedTags.add(tag);
+              button.setAttribute('aria-pressed', String(selectedTags.has(tag)));
               filterRecipes();
-              searchInput.focus();
             });
           });
+          document.querySelectorAll('.recipe-tag').forEach((button) => {
+            button.addEventListener('click', () => {
+              const filterButton = filterTags.find((item) => item.dataset.tag === button.dataset.tag);
+              if (filterButton) filterButton.click();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+          });
+          searchInput.addEventListener('input', filterRecipes);
           filterRecipes();
         </script>
       {% endif %}

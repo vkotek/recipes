@@ -1,6 +1,6 @@
 # Recipes
 
-A simple recipe collection displayed with GitHub Pages and Jekyll. Recipes are stored as Markdown files in `_recipes/`; the homepage renders their titles and contents. Use `category` and `tags` in each recipe's front matter to organize and find recipes.
+A simple recipe collection displayed with GitHub Pages and Jekyll. Each recipe is a Markdown file in `_recipes/`. The landing page shows searchable summaries; selecting a recipe opens its full recipe page.
 
 ## Add a recipe
 
@@ -9,15 +9,15 @@ Create a Markdown file in `_recipes/`, for example `_recipes/vegetable-soup.md`:
 ```markdown
 ---
 title: Vegetable soup
+description: A hearty soup with seasonal vegetables.
 category: Dinner
 tags:
   - vegetarian
   - soup
+servings: 4
 prep_time: 10 minutes
 cook_time: 30 minutes
 ---
-
-A short description.
 
 ### Ingredients
 
@@ -30,7 +30,7 @@ A short description.
 2. Simmer until tender.
 ```
 
-The `title` is required. `category`, `tags`, `prep_time`, and `cook_time` are optional. Search checks recipe text, including ingredients and tags; selecting a tag fills the search field. Categories are available in the category filter. Write recipe content in regular Markdown.
+The `title` is required. `description`, `category`, `tags`, `servings`, `prep_time`, and `cook_time` are optional. Search checks titles, categories, tags, and descriptions. Use the tag buttons to include recipes with all selected tags. The full Markdown recipe opens on its own page.
 
 ## Publish with GitHub Pages
 

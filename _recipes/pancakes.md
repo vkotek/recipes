@@ -1,5 +1,11 @@
 ---
 title: Simple pancakes
+description: Fluffy everyday pancakes for an easy breakfast.
+category: Breakfast
+tags:
+  - vegetarian
+  - quick
+servings: 4
 prep_time: 5 minutes
 cook_time: 15 minutes
 ---

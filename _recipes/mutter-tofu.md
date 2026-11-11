@@ -1,5 +1,6 @@
 ---
 title: Mutter Tofu (Vegan Matar Paneer)
+description: Crispy oven-baked tofu, green peas, and a warmly spiced tomato-cashew gravy.
 category: Dinner
 tags:
   - vegan
@@ -7,6 +8,7 @@ tags:
   - curry
   - tofu
   - peas
+servings: 4
 ---
 
 A plant-based take on matar paneer with crispy oven-baked tofu, green peas, and a warmly spiced tomato-cashew gravy. Serves about 4.
