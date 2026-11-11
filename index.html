@@ -9,7 +9,7 @@ layout: null
     <title>Recipes</title>
     <meta name="description" content="A simple collection of recipes.">
     <style>
-      :root { color-scheme: light; --ink: #29251f; --muted: #71695f; --paper: #fffdf8; --line: #e9e1d5; --accent: #85552f; }
+      :root { color-scheme: light; --ink: #29251f; --muted: #71695f; --paper: #fffdf8; --line: #e9e1d5; --accent: #85552f; --chip: #f3eadc; }
       * { box-sizing: border-box; }
       body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.6 system-ui, sans-serif; }
       header { padding: 3rem 1.25rem 2rem; background: #f3eadc; border-bottom: 1px solid var(--line); }
@@ -17,12 +17,20 @@ layout: null
       h1 { margin: 0; font-size: clamp(2.2rem, 7vw, 3.5rem); line-height: 1.1; }
       header p { margin: .75rem 0 0; color: var(--muted); }
       main { padding-top: 1.5rem; padding-bottom: 4rem; }
+      .filters { display: flex; flex-wrap: wrap; gap: .75rem; margin-bottom: 1rem; }
+      .filters input, .filters select { min-height: 2.8rem; padding: .55rem .75rem; border: 1px solid var(--line); border-radius: .5rem; background: white; color: var(--ink); font: inherit; }
+      .filters input { flex: 1 1 16rem; }
+      .filters select { flex: 0 1 12rem; }
+      .filters input:focus, .filters select:focus, .tag:focus-visible { outline: 3px solid #d5ad7f; outline-offset: 2px; }
       article { padding: 1.5rem 0; border-bottom: 1px solid var(--line); }
       article h2 { margin: 0 0 .25rem; font-size: 1.7rem; }
       .meta { color: var(--muted); font-size: .9rem; }
+      .tag-list { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0 1rem; }
+      .tag { padding: .2rem .55rem; border: 0; border-radius: 999px; background: var(--chip); color: var(--accent); font: inherit; font-size: .82rem; cursor: pointer; }
       .recipe-content h3 { margin: 1.2rem 0 .25rem; font-size: 1.05rem; }
       .recipe-content ul, .recipe-content ol { padding-left: 1.4rem; }
       .empty { color: var(--muted); }
+      @media (max-width: 520px) { .filters { flex-direction: column; } .filters input, .filters select { flex: auto; width: 100%; } }
     </style>
   </head>
   <body>
@@ -32,22 +40,75 @@ layout: null
     </header>
     <main>
       {% assign recipes = site.recipes | sort: 'title' %}
+      {% assign categories = recipes | map: 'category' | compact | uniq | sort %}
+      {% if recipes.size > 0 %}
+        <section class="filters" aria-label="Find recipes">
+          <label class="sr-only" for="recipe-search">Search recipes</label>
+          <input id="recipe-search" type="search" placeholder="Search recipes, ingredients, or tags…" autocomplete="off">
+          <label class="sr-only" for="category-filter">Filter by category</label>
+          <select id="category-filter">
+            <option value="">All categories</option>
+            {% for category in categories %}<option value="{{ category | escape }}">{{ category | escape }}</option>{% endfor %}
+          </select>
+        </section>
+        <p id="result-count" class="meta" aria-live="polite"></p>
+      {% endif %}
       {% if recipes.size == 0 %}
         <p class="empty">No recipes yet. Add a Markdown file to <code>_recipes/</code>.</p>
       {% else %}
         {% for recipe in recipes %}
-          <article>
-            <h2>{{ recipe.title }}</h2>
-            {% if recipe.prep_time or recipe.cook_time %}
+          <article class="recipe" data-category="{{ recipe.category | escape }}">
+            <h2>{{ recipe.title | escape }}</h2>
+            {% if recipe.category or recipe.prep_time or recipe.cook_time %}
               <p class="meta">
-                {% if recipe.prep_time %}Prep: {{ recipe.prep_time }}{% endif %}
+                {% if recipe.category %}{{ recipe.category | escape }}{% endif %}
+                {% if recipe.prep_time or recipe.cook_time %}{% if recipe.category %} · {% endif %}{% endif %}
+                {% if recipe.prep_time %}Prep: {{ recipe.prep_time | escape }}{% endif %}
                 {% if recipe.prep_time and recipe.cook_time %} · {% endif %}
-                {% if recipe.cook_time %}Cook: {{ recipe.cook_time }}{% endif %}
+                {% if recipe.cook_time %}Cook: {{ recipe.cook_time | escape }}{% endif %}
               </p>
+            {% endif %}
+            {% if recipe.tags %}
+              <div class="tag-list" aria-label="Recipe tags">
+                {% for tag in recipe.tags %}<button class="tag" type="button" data-tag="{{ tag | escape }}">{{ tag | escape }}</button>{% endfor %}
+              </div>
             {% endif %}
             <div class="recipe-content">{{ recipe.content }}</div>
           </article>
         {% endfor %}
+        <p id="no-results" class="empty" hidden>No recipes match your search.</p>
+        <script>
+          const searchInput = document.getElementById('recipe-search');
+          const categoryFilter = document.getElementById('category-filter');
+          const recipeCards = [...document.querySelectorAll('.recipe')];
+          const resultCount = document.getElementById('result-count');
+          const noResults = document.getElementById('no-results');
+
+          function filterRecipes() {
+            const query = searchInput.value.trim().toLocaleLowerCase();
+            const category = categoryFilter.value;
+            let visible = 0;
+            recipeCards.forEach((card) => {
+              const matches = card.textContent.toLocaleLowerCase().includes(query)
+                && (!category || card.dataset.category === category);
+              card.hidden = !matches;
+              if (matches) visible += 1;
+            });
+            resultCount.textContent = `Showing ${visible} of ${recipeCards.length} recipes`;
+            noResults.hidden = visible !== 0;
+          }
+
+          searchInput.addEventListener('input', filterRecipes);
+          categoryFilter.addEventListener('change', filterRecipes);
+          document.querySelectorAll('.tag').forEach((tag) => {
+            tag.addEventListener('click', () => {
+              searchInput.value = tag.dataset.tag;
+              filterRecipes();
+              searchInput.focus();
+            });
+          });
+          filterRecipes();
+        </script>
       {% endif %}
     </main>
   </body>
