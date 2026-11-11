@@ -7,6 +7,7 @@ tags:
   - baking
   - banana
   - breakfast
+servings: 10
 prep_time: 10 minutes
 cook_time: 55 minutes
 ---
@@ -39,3 +40,13 @@ A tried-and-true classic vegan banana bread. Ovens vary; start checking the loaf
 ### Storage
 
 Keep covered at room temperature for up to 3 days or refrigerate for up to 1 week. Freeze for up to 2 months. Thaw a wrapped loaf overnight in the refrigerator; reheat slices in a microwave or toaster oven.
+
+### Nutrition
+
+| Nutrient | Per serving (1 slice, 1/10) | Whole recipe (10 slices) |
+| :--- | ---: | ---: |
+| **Calories** | 200 kcal | 2,000 kcal |
+| **Protein** | 3.4 g | 34 g |
+| **Carbohydrates** | 31 g | 308 g |
+| **Fiber** | 2.6 g | 26 g |
+| **Fat** | 7.4 g | 74 g |

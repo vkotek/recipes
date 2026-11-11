@@ -9,6 +9,7 @@ tags:
   - tofu
   - peas
 servings: 4
+source: https://www.youtube.com/watch?v=R0J-7r_Zgoo
 ---
 
 A plant-based take on matar paneer with crispy oven-baked tofu, green peas, and a warmly spiced tomato-cashew gravy. Serves about 4.
@@ -72,9 +73,13 @@ A plant-based take on matar paneer with crispy oven-baked tofu, green peas, and 
 
 ### Nutrition
 
-**Whole recipe (about 4 servings):** 1,180 kcal | Protein: 58 g | Carbohydrates: 96 g | Fat: 64 g | Fiber: 24 g
-
-**Per serving (1/4 of recipe, without sides):** 295 kcal | Protein: 14.5 g | Carbohydrates: 24 g | Fat: 16 g | Fiber: 6 g
+| Nutrient | Per serving (1/4 of recipe, no sides) | Whole recipe (4 servings) |
+| :--- | ---: | ---: |
+| **Calories** | 295 kcal | 1,180 kcal |
+| **Protein** | 14.5 g | 58 g |
+| **Carbohydrates** | 24 g | 96 g |
+| **Fiber** | 6 g | 24 g |
+| **Fat** | 16 g | 64 g |
 
 ### Vegan nutritionist comment
 

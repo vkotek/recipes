@@ -43,3 +43,13 @@ A dairy-free custard made with silken tofu and soya milk, finished with a crackl
 5. Divide the custard among four ramekins. Cool at room temperature, then refrigerate for at least 4 hours.
 6. Just before serving, sprinkle an even layer of brown sugar on each ramekin. Caramelize with a kitchen torch or under a hot grill/broiler until bubbling and golden brown.
 7. Rest for a few minutes, until the topping has set slightly. Decorate with fresh fruit if desired.
+
+### Nutrition
+
+| Nutrient | Per serving (1 ramekin) | Whole recipe (4 ramekins) |
+| :--- | ---: | ---: |
+| **Calories** | 253 kcal | 1,010 kcal |
+| **Protein** | 5 g | 20 g |
+| **Carbohydrates** | 39 g | 156 g |
+| **Fiber** | 0.4 g | 1.5 g |
+| **Fat** | 8.5 g | 34 g |

@@ -6,7 +6,7 @@
     <title>{{ page.title | escape }} · Recipes</title>
     <meta name="description" content="{{ page.description | default: page.title | escape }}">
     <style>
-      :root { color-scheme: light; --ink: #29251f; --muted: #71695f; --paper: #fffdf8; --line: #e9e1d5; --accent: #85552f; --chip: #f3eadc; }
+      :root { color-scheme: light; --ink: #29251f; --muted: #71695f; --paper: #fffdf8; --line: #e9e1d5; --accent: #85552f; --chip: #f3eadc; --active-bg: #fdf6ec; }
       * { box-sizing: border-box; }
       body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.7 system-ui, sans-serif; }
       header { padding: 2rem 1.25rem; background: #f3eadc; border-bottom: 1px solid var(--line); }
@@ -14,19 +14,51 @@
       a { color: var(--accent); }
       header a { font-weight: 650; }
       h1 { margin: .75rem 0 .25rem; font-size: clamp(2rem, 6vw, 3rem); line-height: 1.15; }
-      .meta { color: var(--muted); }
+      .meta { color: var(--muted); margin: .35rem 0; }
+      .meta a { font-weight: 500; }
       main { padding-top: 1.5rem; padding-bottom: 4rem; }
       .hero-image { display: block; width: 100%; max-height: 28rem; object-fit: cover; border-radius: 1rem; margin: 0 0 2rem; }
-      .tags { display: flex; flex-wrap: wrap; gap: .45rem; margin: 1rem 0; }
-      .tag { padding: .2rem .65rem; border-radius: 999px; background: var(--chip); color: var(--accent); font-size: .85rem; }
+      .tags { display: flex; flex-wrap: wrap; gap: .45rem; margin: 1rem 0 0; }
+      .tag { padding: .2rem .65rem; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); color: var(--accent); font-size: .85rem; }
+      .kitchen-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem 1rem; margin-bottom: 1.5rem; background: var(--chip); border: 1px solid var(--line); border-radius: .75rem; max-width: 68ch; }
+      .toolbar-group { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+      .toolbar-label { font-size: .88rem; font-weight: 600; color: var(--muted); margin-right: .2rem; }
+      .btn-tool { padding: .3rem .65rem; border: 1px solid var(--line); border-radius: .45rem; background: white; color: var(--ink); font: inherit; font-size: .88rem; font-weight: 500; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+      .btn-tool:hover { border-color: var(--accent); }
+      .btn-tool:focus-visible, .check-item:focus-visible, .step-item:focus-visible { outline: 3px solid #d5ad7f; outline-offset: 2px; }
+      .btn-tool[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: white; }
+      .btn-reset { background: transparent; border-color: transparent; color: var(--accent); text-decoration: underline; padding: .25rem .4rem; }
+      .wake-status { font-size: .8rem; color: var(--muted); width: 100%; margin: -.25rem 0 0; }
       .recipe-content { max-width: 68ch; }
       .recipe-content h2 { margin-top: 1.8rem; line-height: 1.25; }
       .recipe-content h3 { margin: 1.4rem 0 .35rem; }
       .recipe-content ul, .recipe-content ol { padding-left: 1.5rem; }
-      .recipe-content li + li { margin-top: .3rem; }
+      .recipe-content li + li { margin-top: .35rem; }
+      .recipe-content ul.interactive-list { list-style: none; padding-left: 0; }
+      .check-item { display: flex; align-items: baseline; gap: .65rem; padding: .3rem .5rem; margin: 0 -.5rem; border-radius: .45rem; cursor: pointer; user-select: none; transition: background .12s, color .12s; }
+      .check-item:hover { background: var(--active-bg); }
+      .check-box { flex-shrink: 0; width: 1.05rem; height: 1.05rem; border: 1.5px solid var(--accent); border-radius: .25rem; display: inline-flex; align-items: center; justify-content: center; background: white; transform: translateY(2px); font-size: .75rem; color: white; }
+      .check-item[aria-checked="true"] { color: var(--muted); text-decoration: line-through; }
+      .check-item[aria-checked="true"] .check-box { background: var(--accent); }
+      .check-item[aria-checked="true"] .check-box::after { content: "✓"; }
+      .scaled-num { font-weight: 600; color: var(--accent); }
+      .check-item[aria-checked="true"] .scaled-num { color: inherit; }
+      .step-item { cursor: pointer; padding: .25rem .4rem; margin: 0 -.4rem; border-radius: .45rem; transition: background .12s, color .12s; }
+      .step-item:hover { background: var(--active-bg); }
+      .step-item[aria-checked="true"] { color: var(--muted); text-decoration: line-through; }
       .recipe-content img { max-width: 100%; height: auto; border-radius: .75rem; }
       .recipe-content blockquote { margin-left: 0; padding: .25rem 1rem; border-left: 3px solid var(--line); color: var(--muted); }
-      @media print { header { padding: 0 0 1rem; background: white; } header a { display: none; } header, main { padding-left: 0; padding-right: 0; } .hero-image { max-height: 16rem; } }
+      .recipe-content table { width: 100%; max-width: 34rem; border-collapse: collapse; margin: .75rem 0 1.25rem; font-size: .95rem; font-variant-numeric: tabular-nums; background: white; border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; }
+      .recipe-content th, .recipe-content td { padding: .5rem .85rem; border-bottom: 1px solid var(--line); }
+      .recipe-content th { background: var(--chip); color: var(--ink); font-weight: 650; text-align: left; }
+      .recipe-content tr:last-child td { border-bottom: none; }
+      @media print {
+        header { padding: 0 0 1rem; background: white; }
+        header > a, .kitchen-toolbar { display: none !important; }
+        header, main { padding-left: 0; padding-right: 0; }
+        .hero-image { max-height: 16rem; }
+        .check-box { border-color: #999; }
+      }
     </style>
   </head>
   <body>
@@ -34,16 +66,282 @@
       <a href="{{ '/' | relative_url }}">← All recipes</a>
       <h1>{{ page.title | escape }}</h1>
       <p class="meta">
-        {% if page.category %}{{ page.category | escape }}{% endif %}
-        {% if page.servings %}{% if page.category %} · {% endif %}Serves {{ page.servings | escape }}{% endif %}
-        {% if page.prep_time %}{% if page.category or page.servings %} · {% endif %}Prep {{ page.prep_time | escape }}{% endif %}
-        {% if page.cook_time %}{% if page.category or page.servings or page.prep_time %} · {% endif %}Cook {{ page.cook_time | escape }}{% endif %}
+        {% assign has_meta = false %}
+        {% if page.category %}{{ page.category | escape }}{% assign has_meta = true %}{% endif %}
+        {% if page.servings %}{% if has_meta %} · {% endif %}<span id="recipe-servings" data-base-servings="{{ page.servings | escape }}">Serves {{ page.servings | escape }}</span>{% assign has_meta = true %}{% endif %}
+        {% if page.prep_time %}{% if has_meta %} · {% endif %}Prep {{ page.prep_time | escape }}{% assign has_meta = true %}{% endif %}
+        {% if page.cook_time %}{% if has_meta %} · {% endif %}Cook {{ page.cook_time | escape }}{% assign has_meta = true %}{% endif %}
+        {% if page.source %}{% if has_meta %} · {% endif %}<a href="{{ page.source | escape }}" target="_blank" rel="noopener">Original source ↗</a>{% endif %}
       </p>
       {% if page.tags %}<div class="tags">{% for tag in page.tags %}<span class="tag">{{ tag | escape }}</span>{% endfor %}</div>{% endif %}
     </header>
     <main>
       {% if page.image %}<img class="hero-image" src="{{ page.image | relative_url }}" alt="{{ page.image_alt | default: page.title | escape }}">{% endif %}
-      <div class="recipe-content">{{ content }}</div>
+      <section class="kitchen-toolbar" aria-label="Cooking tools">
+        <div class="toolbar-group" role="group" aria-label="Portion multiplier">
+          <span class="toolbar-label">Scale:</span>
+          <button type="button" class="btn-tool scale-btn" data-scale="0.5" aria-pressed="false">0.5×</button>
+          <button type="button" class="btn-tool scale-btn" data-scale="1" aria-pressed="true">1×</button>
+          <button type="button" class="btn-tool scale-btn" data-scale="2" aria-pressed="false">2×</button>
+          <button type="button" class="btn-tool scale-btn" data-scale="3" aria-pressed="false">3×</button>
+        </div>
+        <div class="toolbar-group">
+          <button type="button" id="reset-checks" class="btn-tool btn-reset" hidden>Reset checks</button>
+          <button type="button" id="wake-toggle" class="btn-tool" aria-pressed="false">☀️ Cook Mode</button>
+        </div>
+        <p id="wake-status" class="wake-status" aria-live="polite" hidden></p>
+      </section>
+      <div class="recipe-content" id="recipe-content">{{ content }}</div>
     </main>
+    <script>
+      (function () {
+        const contentEl = document.getElementById('recipe-content');
+        const resetBtn = document.getElementById('reset-checks');
+        const servingsEl = document.getElementById('recipe-servings');
+        const scaleBtns = [...document.querySelectorAll('.scale-btn')];
+        const wakeToggle = document.getElementById('wake-toggle');
+        const wakeStatus = document.getElementById('wake-status');
+
+        // 1. Identify ingredient lists (under Ingredients / Suroviny headings, or fallback to all ul)
+        const headings = [...contentEl.querySelectorAll('h2, h3')];
+        const ingredientHeadings = headings.filter((h) => /ingredients|suroviny/i.test(h.textContent));
+        const ingredientLists = [];
+
+        if (ingredientHeadings.length > 0) {
+          ingredientHeadings.forEach((heading) => {
+            let sibling = heading.nextElementSibling;
+            while (sibling && !/^H[1-3]$/.test(sibling.tagName)) {
+              if (sibling.tagName === 'UL') ingredientLists.push(sibling);
+              sibling = sibling.nextElementSibling;
+            }
+          });
+        } else {
+          ingredientLists.push(...contentEl.querySelectorAll('ul'));
+        }
+
+        // Tokenize numbers in ingredient text nodes so we can scale them cleanly
+        const numPattern = /(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?)(?!\s*-?(?:oz|inch|cm\b)|°)/gi;
+
+        function parseQuantity(str) {
+          const clean = str.trim();
+          if (clean.includes(' ')) {
+            const [whole, frac] = clean.split(/\s+/);
+            const [num, den] = frac.split('/').map(Number);
+            return Number(whole) + (den ? num / den : 0);
+          }
+          if (clean.includes('/')) {
+            const [num, den] = clean.split('/').map(Number);
+            return den ? num / den : Number(clean);
+          }
+          return Number(clean);
+        }
+
+        const commonFractions = [
+          [1 / 8, '1/8'],
+          [1 / 4, '1/4'],
+          [1 / 3, '1/3'],
+          [3 / 8, '3/8'],
+          [1 / 2, '1/2'],
+          [5 / 8, '5/8'],
+          [2 / 3, '2/3'],
+          [3 / 4, '3/4'],
+          [7 / 8, '7/8']
+        ];
+
+        function formatQuantity(val, wasFraction) {
+          if (Math.abs(val - Math.round(val)) < 0.01) {
+            return String(Math.round(val));
+          }
+          if (wasFraction) {
+            const whole = Math.floor(val + 0.01);
+            const rem = val - whole;
+            for (const [fVal, fStr] of commonFractions) {
+              if (Math.abs(rem - fVal) < 0.03) {
+                return whole > 0 ? `${whole} ${fStr}` : fStr;
+              }
+            }
+          }
+          return Number(val.toFixed(2)).toString();
+        }
+
+        function wrapNumbersInTextNode(textNode) {
+          const text = textNode.nodeValue;
+          if (!numPattern.test(text)) return;
+          numPattern.lastIndex = 0;
+
+          const frag = document.createDocumentFragment();
+          let lastIdx = 0;
+          let match;
+          while ((match = numPattern.exec(text)) !== null) {
+            if (match.index > lastIdx) {
+              frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
+            }
+            const span = document.createElement('span');
+            span.className = 'qty-val';
+            span.dataset.base = match[1];
+            span.dataset.fraction = String(match[1].includes('/'));
+            span.textContent = match[1];
+            frag.appendChild(span);
+            lastIdx = numPattern.lastIndex;
+          }
+          if (lastIdx < text.length) {
+            frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+          }
+          textNode.parentNode.replaceChild(frag, textNode);
+        }
+
+        function updateResetVisibility() {
+          const anyChecked = contentEl.querySelector('[aria-checked="true"]') !== null;
+          resetBtn.hidden = !anyChecked;
+        }
+
+        function toggleCheckable(el) {
+          const checked = el.getAttribute('aria-checked') === 'true';
+          el.setAttribute('aria-checked', String(!checked));
+          updateResetVisibility();
+        }
+
+        ingredientLists.forEach((ul) => {
+          ul.classList.add('interactive-list');
+          [...ul.querySelectorAll('li')].forEach((li) => {
+            const walker = document.createTreeWalker(li, NodeFilter.SHOW_TEXT);
+            const textNodes = [];
+            while (walker.nextNode()) textNodes.push(walker.currentNode);
+            textNodes.forEach(wrapNumbersInTextNode);
+
+            li.classList.add('check-item');
+            li.setAttribute('role', 'checkbox');
+            li.setAttribute(' aria-checked'.trim(), 'false');
+            li.setAttribute('tabindex', '0');
+
+            const box = document.createElement('span');
+            box.className = 'check-box';
+            box.setAttribute('aria-hidden', 'true');
+
+            const textWrap = document.createElement('span');
+            while (li.firstChild) textWrap.appendChild(li.firstChild);
+            li.appendChild(box);
+            li.appendChild(textWrap);
+
+            li.addEventListener('click', (e) => {
+              if (e.target.tagName === 'A') return;
+              toggleCheckable(li);
+            });
+            li.addEventListener('keydown', (e) => {
+              if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                toggleCheckable(li);
+              }
+            });
+          });
+        });
+
+        // Make method steps checkable too
+        contentEl.querySelectorAll('ol li').forEach((li) => {
+          li.classList.add('step-item');
+          li.setAttribute('role', 'checkbox');
+          li.setAttribute('aria-checked', 'false');
+          li.setAttribute('tabindex', '0');
+          li.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') return;
+            toggleCheckable(li);
+          });
+          li.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+              e.preventDefault();
+              toggleCheckable(li);
+            }
+          });
+        });
+
+        resetBtn.addEventListener('click', () => {
+          contentEl.querySelectorAll('[aria-checked="true"]').forEach((el) => {
+            el.setAttribute('aria-checked', 'false');
+          });
+          updateResetVisibility();
+        });
+
+        // 2. Portion Scaling
+        scaleBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const scale = Number(btn.dataset.scale);
+            scaleBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+
+            contentEl.querySelectorAll('.qty-val').forEach((span) => {
+              const baseStr = span.dataset.base;
+              if (scale === 1) {
+                span.textContent = baseStr;
+                span.classList.remove('scaled-num');
+              } else {
+                const baseVal = parseQuantity(baseStr);
+                const wasFraction = span.dataset.fraction === 'true';
+                span.textContent = formatQuantity(baseVal * scale, wasFraction);
+                span.classList.add('scaled-num');
+              }
+            });
+
+            if (servingsEl) {
+              const baseServings = Number(servingsEl.dataset.baseServings);
+              if (!Number.isNaN(baseServings)) {
+                const scaledServings = formatQuantity(baseServings * scale, false);
+                servingsEl.textContent = `Serves ${scaledServings}`;
+              }
+            }
+          });
+        });
+
+        // 3. Cook Mode (Screen Wake Lock API)
+        let wakeLock = null;
+        let cookModeWanted = false;
+
+        async function requestWakeLock() {
+          if (!('wakeLock' in navigator)) {
+            wakeStatus.textContent = 'Screen wake lock is not supported on this browser.';
+            wakeStatus.hidden = false;
+            return;
+          }
+          try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            wakeToggle.setAttribute('aria-pressed', 'true');
+            wakeToggle.textContent = '☀️ Cook Mode: On';
+            wakeStatus.hidden = true;
+            wakeLock.addEventListener('release', () => {
+              if (!cookModeWanted) {
+                wakeToggle.setAttribute('aria-pressed', 'false');
+                wakeToggle.textContent = '☀️ Cook Mode';
+              }
+            });
+          } catch (err) {
+            wakeStatus.textContent = 'Could not keep screen awake on this device.';
+            wakeStatus.hidden = false;
+            cookModeWanted = false;
+            wakeToggle.setAttribute('aria-pressed', 'false');
+            wakeToggle.textContent = '☀️ Cook Mode';
+          }
+        }
+
+        wakeToggle.addEventListener('click', async () => {
+          if (cookModeWanted) {
+            cookModeWanted = false;
+            if (wakeLock) {
+              await wakeLock.release();
+              wakeLock = null;
+            }
+            wakeToggle.setAttribute('aria-pressed', 'false');
+            wakeToggle.textContent = '☀️ Cook Mode';
+            wakeStatus.hidden = true;
+          } else {
+            cookModeWanted = true;
+            await requestWakeLock();
+          }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (cookModeWanted && document.visibilityState === 'visible') {
+            requestWakeLock();
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

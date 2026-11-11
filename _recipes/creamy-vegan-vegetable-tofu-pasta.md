@@ -50,9 +50,13 @@ A creamy, plant-based pasta with caramelized mushrooms and onions, blended tofu 
 
 ### Nutrition
 
-**Estimated whole recipe (about 4 servings):** 2,100 kcal | Protein: 105 g | Carbohydrates: 330 g | Fat: 25 g
-
-**Estimated per serving (1/4 of recipe):** 525 kcal | Protein: 26 g | Carbohydrates: 82 g | Fat: 6 g
+| Nutrient | Per serving (1/4 of recipe) | Whole recipe (4 servings) |
+| :--- | ---: | ---: |
+| **Calories** | 525 kcal | 2,100 kcal |
+| **Protein** | 26 g | 105 g |
+| **Carbohydrates** | 82 g | 330 g |
+| **Fiber** | 14 g | 56 g |
+| **Fat** | 6 g | 25 g |
 
 ### Vegan nutritionist comment
 

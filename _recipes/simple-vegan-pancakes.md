@@ -51,7 +51,13 @@ You can use a little less oil (about 20 g). If adding one overripe banana, reduc
 
 ### Nutrition
 
-**Estimated per serving (2 pancakes):** 270 kcal | Carbohydrates: 45 g | Protein: 6 g | Fat: 8 g
+| Nutrient | Per serving (2 pancakes) | Whole recipe (8 pancakes) |
+| :--- | ---: | ---: |
+| **Calories** | 270 kcal | 1,080 kcal |
+| **Protein** | 6 g | 24 g |
+| **Carbohydrates** | 45 g | 180 g |
+| **Fiber** | 1.8 g | 7 g |
+| **Fat** | 8 g | 32 g |
 
 ### Vegan nutritionist comment
 

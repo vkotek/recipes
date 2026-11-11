@@ -66,4 +66,12 @@ Adjust the heat to taste: omit the peppers for no heat, use one seeded serrano o
 
 ### Nutrition
 
-**Per serving:** 517 kcal | Carbohydrates: 45 g | Protein: 19 g | Fat: 32 g | Saturated fat: 22 g | Polyunsaturated fat: 2 g | Monounsaturated fat: 5 g | Sodium: 164 mg | Potassium: 1,113 mg | Fiber: 19 g | Sugar: 7 g | Vitamin A: 474 IU | Vitamin C: 22 mg | Calcium: 141 mg | Iron: 9 mg
+| Nutrient | Per serving (1/4 of recipe) | Whole recipe (4 servings) |
+| :--- | ---: | ---: |
+| **Calories** | 517 kcal | 2,068 kcal |
+| **Protein** | 19 g | 76 g |
+| **Carbohydrates** | 45 g | 180 g |
+| **Fiber** | 19 g | 76 g |
+| **Fat** | 32 g | 128 g |
+
+**Additional per serving:** Saturated fat: 22 g | Monounsaturated fat: 5 g | Polyunsaturated fat: 2 g | Sugar: 7 g | Sodium: 164 mg | Potassium: 1,113 mg | Calcium: 141 mg | Iron: 9 mg | Vitamin A: 474 IU | Vitamin C: 22 mg

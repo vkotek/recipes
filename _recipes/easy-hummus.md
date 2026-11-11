@@ -43,9 +43,13 @@ Creamy, lemony hummus. The whole recipe makes about 1.5 cups, or roughly six 1/4
 
 ### Nutrition
 
-**Per serving (1/4 cup):** 155 kcal | Fat: 11 g | Carbohydrates: 11.8 g | Fiber: 2.9 g | Protein: 4.5 g
-
-**Whole recipe (about 1.5 cups):** 930 kcal | Fat: 66 g | Carbohydrates: 71 g | Fiber: 17 g | Protein: 27 g
+| Nutrient | Per serving (1/4 cup) | Whole recipe (about 1.5 cups) |
+| :--- | ---: | ---: |
+| **Calories** | 155 kcal | 930 kcal |
+| **Protein** | 4.5 g | 27 g |
+| **Carbohydrates** | 11.8 g | 71 g |
+| **Fiber** | 2.9 g | 17 g |
+| **Fat** | 11 g | 66 g |
 
 ### Vegan nutritionist comment
 

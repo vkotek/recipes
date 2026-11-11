@@ -25,7 +25,10 @@ layout: null
       .tag[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: white; }
       .meta { color: var(--muted); font-size: .9rem; }
       .recipe-list { list-style: none; padding: 0; margin: 0; }
-      .recipe-item { padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
+      .recipe-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.25rem; padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
+      .recipe-item[hidden] { display: none; }
+      .recipe-body { flex: 1; min-width: 0; }
+      .recipe-thumb { flex-shrink: 0; width: 6.5rem; height: 6.5rem; object-fit: cover; border-radius: .65rem; border: 1px solid var(--line); }
       .recipe-link { display: inline-block; color: var(--ink); text-decoration: none; }
       .recipe-link:hover h2 { color: var(--accent); text-decoration: underline; }
       .recipe-item h2 { margin: 0; font-size: 1.45rem; }
@@ -34,7 +37,7 @@ layout: null
       .recipe-item .tag { padding: .12rem .5rem; font-size: .78rem; cursor: pointer; }
       .empty { color: var(--muted); }
       .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-      @media (max-width: 520px) { header { padding-top: 2.25rem; } .filters { grid-template-columns: 1fr; } }
+      @media (max-width: 520px) { header { padding-top: 2.25rem; } .filters { grid-template-columns: 1fr; } .recipe-thumb { width: 5rem; height: 5rem; } }
     </style>
   </head>
   <body>
@@ -51,7 +54,7 @@ layout: null
       {% else %}
         <section class="filters" aria-label="Filter recipes">
           <label class="sr-only" for="recipe-search">Search recipes</label>
-          <input id="recipe-search" type="search" placeholder="Search recipes…" autocomplete="off">
+          <input id="recipe-search" type="search" placeholder="Search recipes, ingredients, or tags…" autocomplete="off">
           <label class="sr-only" for="category-filter">Filter by category</label>
           <select id="category-filter">
             <option value="">All categories</option>
@@ -59,7 +62,16 @@ layout: null
           </select>
           {% if all_tags.size > 0 %}
             <div class="tag-list" aria-label="Filter by tags">
-              {% for tag in all_tags %}<button class="tag filter-tag" type="button" data-tag="{{ tag | strip | escape }}" aria-pressed="false">{{ tag | strip | escape }}</button>{% endfor %}
+              {% assign seen_tags = "" %}
+              {% for tag in all_tags %}
+                {% assign clean_tag = tag | strip %}
+                {% assign lower_tag = clean_tag | downcase %}
+                {% assign tag_marker = "|" | append: lower_tag | append: "|" %}
+                {% unless seen_tags contains tag_marker or clean_tag == "" %}
+                  {% assign seen_tags = seen_tags | append: tag_marker %}
+                  <button class="tag filter-tag" type="button" data-tag="{{ lower_tag | escape }}" aria-pressed="false">{{ clean_tag | escape }}</button>
+                {% endunless %}
+              {% endfor %}
             </div>
           {% endif %}
         </section>
@@ -67,21 +79,29 @@ layout: null
         <ul class="recipe-list">
           {% for recipe in recipes %}
             {% assign description = recipe.description | default: recipe.excerpt | strip_html | strip_newlines | strip %}
+            {% assign body_text = recipe.content | strip_html | strip_newlines | strip %}
             {% assign tag_text = recipe.tags | join: ' ' %}
-            {% assign searchable = recipe.title | append: ' ' | append: recipe.category | append: ' ' | append: tag_text | append: ' ' | append: description | downcase %}
+            {% assign searchable = recipe.title | append: ' ' | append: recipe.category | append: ' ' | append: tag_text | append: ' ' | append: description | append: ' ' | append: body_text | downcase %}
             <li class="recipe-item" data-search="{{ searchable | escape }}" data-category="{{ recipe.category | downcase | escape }}" data-tags="{{ recipe.tags | join: '|' | downcase | escape }}">
-              <a class="recipe-link" href="{{ recipe.url | relative_url }}"><h2>{{ recipe.title | escape }}</h2></a>
-              <p class="meta">
-                {% if recipe.category %}{{ recipe.category | escape }}{% endif %}
-                {% if recipe.servings %}{% if recipe.category %} · {% endif %}Serves {{ recipe.servings | escape }}{% endif %}
-                {% if recipe.prep_time %}{% if recipe.category or recipe.servings %} · {% endif %}Prep {{ recipe.prep_time | escape }}{% endif %}
-                {% if recipe.cook_time %}{% if recipe.category or recipe.servings or recipe.prep_time %} · {% endif %}Cook {{ recipe.cook_time | escape }}{% endif %}
-              </p>
-              <p>{{ description }}</p>
-              {% if recipe.tags %}
-                <div class="tag-list" aria-label="Recipe tags">
-                  {% for tag in recipe.tags %}<button class="tag recipe-tag" type="button" data-tag="{{ tag | escape }}" aria-label="Filter by {{ tag | escape }}">{{ tag | escape }}</button>{% endfor %}
-                </div>
+              <div class="recipe-body">
+                <a class="recipe-link" href="{{ recipe.url | relative_url }}"><h2>{{ recipe.title | escape }}</h2></a>
+                <p class="meta">
+                  {% if recipe.category %}{{ recipe.category | escape }}{% endif %}
+                  {% if recipe.servings %}{% if recipe.category %} · {% endif %}Serves {{ recipe.servings | escape }}{% endif %}
+                  {% if recipe.prep_time %}{% if recipe.category or recipe.servings %} · {% endif %}Prep {{ recipe.prep_time | escape }}{% endif %}
+                  {% if recipe.cook_time %}{% if recipe.category or recipe.servings or recipe.prep_time %} · {% endif %}Cook {{ recipe.cook_time | escape }}{% endif %}
+                </p>
+                <p>{{ description }}</p>
+                {% if recipe.tags %}
+                  <div class="tag-list" aria-label="Recipe tags">
+                    {% for tag in recipe.tags %}<button class="tag recipe-tag" type="button" data-tag="{{ tag | strip | downcase | escape }}" aria-label="Filter by {{ tag | escape }}">{{ tag | escape }}</button>{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              {% if recipe.image %}
+                <a href="{{ recipe.url | relative_url }}" tabindex="-1" aria-hidden="true">
+                  <img class="recipe-thumb" src="{{ recipe.image | relative_url }}" alt="{{ recipe.image_alt | default: recipe.title | escape }}" loading="lazy">
+                </a>
               {% endif %}
             </li>
           {% endfor %}
@@ -104,7 +124,7 @@ layout: null
               const tags = recipe.dataset.tags.toLocaleLowerCase().split('|').filter(Boolean);
               const matchesSearch = recipe.dataset.search.includes(query);
               const matchesCategory = !category || recipe.dataset.category === category;
-              const matchesTags = [...selectedTags].every((tag) => tags.includes(tag.toLocaleLowerCase()));
+              const matchesTags = [...selectedTags].every((tag) => tags.includes(tag));
               recipe.hidden = !(matchesSearch && matchesCategory && matchesTags);
               if (!recipe.hidden) visible += 1;
             });
@@ -114,7 +134,7 @@ layout: null
 
           filterTags.forEach((button) => {
             button.addEventListener('click', () => {
-              const tag = button.dataset.tag;
+              const tag = button.dataset.tag.toLocaleLowerCase();
               if (selectedTags.has(tag)) selectedTags.delete(tag);
               else selectedTags.add(tag);
               button.setAttribute('aria-pressed', String(selectedTags.has(tag)));
@@ -123,7 +143,8 @@ layout: null
           });
           document.querySelectorAll('.recipe-tag').forEach((button) => {
             button.addEventListener('click', () => {
-              const filterButton = filterTags.find((item) => item.dataset.tag === button.dataset.tag);
+              const targetTag = button.dataset.tag.toLocaleLowerCase();
+              const filterButton = filterTags.find((item) => item.dataset.tag.toLocaleLowerCase() === targetTag);
               if (filterButton) filterButton.click();
               window.scrollTo({ top: 0, behavior: 'smooth' });
             });
