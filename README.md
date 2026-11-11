@@ -1,6 +1,6 @@
 # Recipes
 
-A simple recipe collection displayed with GitHub Pages and Jekyll. Each recipe is a Markdown file in `_recipes/`. The landing page shows searchable summaries; selecting a recipe opens its full recipe page.
+A simple recipe collection displayed with GitHub Pages and Jekyll. Each recipe is a Markdown file in `_recipes/`. The landing page shows searchable summaries; selecting a recipe opens its full recipe page, styled by a shared layout.
 
 ## Add a recipe
 
@@ -17,6 +17,8 @@ tags:
 servings: 4
 prep_time: 10 minutes
 cook_time: 30 minutes
+image: /assets/images/vegetable-soup.jpg
+image_alt: A bowl of vegetable soup with fresh herbs
 ---
 
 ### Ingredients
@@ -30,7 +32,7 @@ cook_time: 30 minutes
 2. Simmer until tender.
 ```
 
-The `title` is required. `description`, `category`, `tags`, `servings`, `prep_time`, and `cook_time` are optional. Search checks titles, categories, tags, and descriptions. Use the tag buttons to include recipes with all selected tags. The full Markdown recipe opens on its own page.
+The `title` is required. `description`, `category`, `tags`, `servings`, `prep_time`, `cook_time`, `image`, and `image_alt` are optional. Put recipe photos in `assets/images/` and use a site-root path such as `/assets/images/vegetable-soup.jpg`. Recipe pages render the Markdown with a shared responsive style; the hero photo appears when an `image` is provided. Search checks titles, categories, tags, and descriptions. Use the tag buttons to include recipes with all selected tags.
 
 ## Publish with GitHub Pages
 

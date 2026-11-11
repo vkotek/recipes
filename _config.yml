@@ -5,3 +5,9 @@ collections:
     output: true
     sort_by: title
     permalink: /recipes/:name/
+defaults:
+  - scope:
+      path: ""
+      type: recipes
+    values:
+      layout: recipe
