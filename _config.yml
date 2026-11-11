@@ -1,0 +1,6 @@
+title: Recipes
+markdown: kramdown
+collections:
+  recipes:
+    output: false
+    sort_by: title

@@ -1,0 +1,54 @@
+---
+layout: null
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Recipes</title>
+    <meta name="description" content="A simple collection of recipes.">
+    <style>
+      :root { color-scheme: light; --ink: #29251f; --muted: #71695f; --paper: #fffdf8; --line: #e9e1d5; --accent: #85552f; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.6 system-ui, sans-serif; }
+      header { padding: 3rem 1.25rem 2rem; background: #f3eadc; border-bottom: 1px solid var(--line); }
+      header, main { padding-left: max(1.25rem, calc((100% - 760px) / 2)); padding-right: max(1.25rem, calc((100% - 760px) / 2)); }
+      h1 { margin: 0; font-size: clamp(2.2rem, 7vw, 3.5rem); line-height: 1.1; }
+      header p { margin: .75rem 0 0; color: var(--muted); }
+      main { padding-top: 1.5rem; padding-bottom: 4rem; }
+      article { padding: 1.5rem 0; border-bottom: 1px solid var(--line); }
+      article h2 { margin: 0 0 .25rem; font-size: 1.7rem; }
+      .meta { color: var(--muted); font-size: .9rem; }
+      .recipe-content h3 { margin: 1.2rem 0 .25rem; font-size: 1.05rem; }
+      .recipe-content ul, .recipe-content ol { padding-left: 1.4rem; }
+      .empty { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Recipes</h1>
+      <p>A small collection of things worth cooking again.</p>
+    </header>
+    <main>
+      {% assign recipes = site.recipes | sort: 'title' %}
+      {% if recipes.size == 0 %}
+        <p class="empty">No recipes yet. Add a Markdown file to <code>_recipes/</code>.</p>
+      {% else %}
+        {% for recipe in recipes %}
+          <article>
+            <h2>{{ recipe.title }}</h2>
+            {% if recipe.prep_time or recipe.cook_time %}
+              <p class="meta">
+                {% if recipe.prep_time %}Prep: {{ recipe.prep_time }}{% endif %}
+                {% if recipe.prep_time and recipe.cook_time %} · {% endif %}
+                {% if recipe.cook_time %}Cook: {{ recipe.cook_time }}{% endif %}
+              </p>
+            {% endif %}
+            <div class="recipe-content">{{ recipe.content }}</div>
+          </article>
+        {% endfor %}
+      {% endif %}
+    </main>
+  </body>
+</html>
