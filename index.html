@@ -121,8 +121,9 @@ layout: null
             </div>
 
             <div class="select-group">
+              <!-- Hidden by default since category pills are shown below; remove `hidden` to show the dropdown again -->
               <label class="sr-only" for="category-filter">Filter by category</label>
-              <select id="category-filter" class="control-select">
+              <select id="category-filter" class="control-select" hidden>
                 <option value="">All categories</option>
                 {% for category in categories %}
                   <option value="{{ category | downcase | escape }}">{{ category | escape }}</option>
