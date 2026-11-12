@@ -6,154 +6,608 @@ layout: null
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Recipes</title>
-    <meta name="description" content="Browse and search a simple collection of recipes.">
-    <style>
-      :root { color-scheme: light; --ink: #29251f; --muted: #71695f; --paper: #fffdf8; --line: #e9e1d5; --accent: #85552f; --chip: #f3eadc; }
-      * { box-sizing: border-box; }
-      body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.6 system-ui, sans-serif; }
-      header { padding: 3rem 1.25rem 2rem; background: #f3eadc; border-bottom: 1px solid var(--line); }
-      header, main { padding-left: max(1.25rem, calc((100% - 820px) / 2)); padding-right: max(1.25rem, calc((100% - 820px) / 2)); }
-      h1 { margin: 0; font-size: clamp(2.2rem, 7vw, 3.5rem); line-height: 1.1; }
-      header p { margin: .75rem 0 0; color: var(--muted); }
-      main { padding-top: 1.5rem; padding-bottom: 4rem; }
-      .filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(10rem, 14rem); gap: .75rem; margin-bottom: 1rem; }
-      .filters input, .filters select { width: 100%; min-height: 2.8rem; padding: .55rem .75rem; border: 1px solid var(--line); border-radius: .5rem; background: white; color: var(--ink); font: inherit; }
-      .filters input:focus, .filters select:focus, .tag:focus-visible, .recipe-link:focus-visible { outline: 3px solid #d5ad7f; outline-offset: 2px; }
-      .tag-list { display: flex; flex-wrap: wrap; gap: .45rem; }
-      .tag { padding: .25rem .65rem; border: 1px solid var(--line); border-radius: 999px; background: white; color: var(--accent); font: inherit; font-size: .85rem; cursor: pointer; }
-      .tag[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: white; }
-      .meta { color: var(--muted); font-size: .9rem; }
-      .recipe-list { list-style: none; padding: 0; margin: 0; }
-      .recipe-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.25rem; padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
-      .recipe-item[hidden] { display: none; }
-      .recipe-body { flex: 1; min-width: 0; }
-      .recipe-thumb { flex-shrink: 0; width: 6.5rem; height: 6.5rem; object-fit: cover; border-radius: .65rem; border: 1px solid var(--line); }
-      .recipe-link { display: inline-block; color: var(--ink); text-decoration: none; }
-      .recipe-link:hover h2 { color: var(--accent); text-decoration: underline; }
-      .recipe-item h2 { margin: 0; font-size: 1.45rem; }
-      .recipe-item p { margin: .35rem 0 .65rem; }
-      .recipe-item .tag-list { margin-top: .65rem; }
-      .recipe-item .tag { padding: .12rem .5rem; font-size: .78rem; cursor: pointer; }
-      .empty { color: var(--muted); }
-      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-      @media (max-width: 520px) { header { padding-top: 2.25rem; } .filters { grid-template-columns: 1fr; } .recipe-thumb { width: 5rem; height: 5rem; } }
-    </style>
+    <title>{{ site.title | default: "Vojtovo Cookbook" }}</title>
+    <meta name="description" content="{{ site.description | default: 'Browse and search Vojtovo Cookbook — a modern collection of plant-based recipes with interactive cooking tools.' }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <script>
+      (function () {
+        try {
+          const savedTheme = localStorage.getItem('vojtovo_theme');
+          const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
-    <header>
-      <h1>Recipes</h1>
-      <p>Find something good to cook.</p>
+    {% assign recipes = site.recipes | sort: 'title' %}
+    {% assign all_tags = recipes | map: 'tags' | join: ',' | split: ',' | uniq | sort_natural %}
+    {% assign categories = recipes | map: 'category' | compact | uniq | sort_natural %}
+
+    <nav class="site-nav" aria-label="Primary navigation">
+      <div class="site-nav-inner">
+        <a class="brand-link" href="{{ '/' | relative_url }}">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 0 6h-1v5a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-5H7a3 3 0 0 1 0-6h1V6a4 4 0 0 1 4-4Z"/>
+              <path d="M8 16h8"/>
+            </svg>
+          </span>
+          <span>Vojtovo Cookbook</span>
+        </a>
+
+        <div class="nav-actions">
+          {% if recipes.size > 0 %}
+            <button type="button" id="surprise-btn" class="btn-nav" title="Open a random recipe">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                <path d="M16 8h.01"/><path d="M12 12h.01"/><path d="M8 16h.01"/><path d="M8 8h.01"/><path d="M16 16h.01"/>
+              </svg>
+              <span>Surprise me</span>
+            </button>
+            <button type="button" id="saved-filter-btn" class="btn-nav" aria-pressed="false" title="Show saved favorite recipes">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+              </svg>
+              <span>Saved</span>
+              <span id="saved-count-badge" class="saved-count-badge">0</span>
+            </button>
+          {% endif %}
+          <button type="button" id="theme-toggle" class="btn-nav btn-icon-only" aria-label="Toggle color theme" title="Toggle light/dark mode">
+            <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden>
+              <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+            </svg>
+            <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero-header">
+      <div class="hero-inner">
+        <div>
+          <div class="hero-eyebrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+            </svg>
+            <span>Plant-Based Kitchen Archive</span>
+          </div>
+          <h1>Vojtovo Cookbook</h1>
+          <p class="hero-subtitle">Find something good to cook — complete with portion scaling, interactive checklists, step timers, and full macro breakdowns.</p>
+        </div>
+        {% if recipes.size > 0 %}
+          <div class="hero-stats" aria-label="Cookbook statistics">
+            <div class="stat-item">
+              <span class="stat-value">{{ recipes.size }}</span>
+              <span class="stat-label">Recipes</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">{{ categories.size }}</span>
+              <span class="stat-label">Categories</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">100%</span>
+              <span class="stat-label">Plant-Based</span>
+            </div>
+          </div>
+        {% endif %}
+      </div>
     </header>
-    <main>
-      {% assign recipes = site.recipes | sort: 'title' %}
-      {% assign all_tags = recipes | map: 'tags' | join: ',' | split: ',' | uniq | sort_natural %}
-      {% assign categories = recipes | map: 'category' | compact | uniq | sort_natural %}
+
+    <main class="container">
       {% if recipes.size == 0 %}
-        <p class="empty">No recipes yet. Add a Markdown file to <code>_recipes/</code>.</p>
+        <div class="empty-state">
+          <h3>No recipes yet</h3>
+          <p>Add a Markdown file to <code>_recipes/</code> to get started.</p>
+        </div>
       {% else %}
-        <section class="filters" aria-label="Filter recipes">
-          <label class="sr-only" for="recipe-search">Search recipes</label>
-          <input id="recipe-search" type="search" placeholder="Search recipes, ingredients, or tags…" autocomplete="off">
-          <label class="sr-only" for="category-filter">Filter by category</label>
-          <select id="category-filter">
-            <option value="">All categories</option>
-            {% for category in categories %}<option value="{{ category | downcase | escape }}">{{ category | escape }}</option>{% endfor %}
-          </select>
-          {% if all_tags.size > 0 %}
-            <div class="tag-list" aria-label="Filter by tags">
-              {% assign seen_tags = "" %}
-              {% for tag in all_tags %}
-                {% assign clean_tag = tag | strip %}
-                {% assign lower_tag = clean_tag | downcase %}
-                {% assign tag_marker = "|" | append: lower_tag | append: "|" %}
-                {% unless seen_tags contains tag_marker or clean_tag == "" %}
-                  {% assign seen_tags = seen_tags | append: tag_marker %}
-                  <button class="tag filter-tag" type="button" data-tag="{{ lower_tag | escape }}" aria-pressed="false">{{ clean_tag | escape }}</button>
-                {% endunless %}
+        <section class="filter-panel" aria-label="Filter recipes">
+          <div class="search-row">
+            <div class="search-input-wrap">
+              <label class="sr-only" for="recipe-search">Search recipes</label>
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+              </svg>
+              <input id="recipe-search" type="search" placeholder="Search recipes, ingredients, spices, or tags…" autocomplete="off">
+              <kbd id="search-kbd" class="search-kbd" aria-hidden="true">/</kbd>
+              <button type="button" id="search-clear" class="search-clear-btn" aria-label="Clear search" hidden>×</button>
+            </div>
+
+            <div class="select-group">
+              <label class="sr-only" for="category-filter">Filter by category</label>
+              <select id="category-filter" class="control-select">
+                <option value="">All categories</option>
+                {% for category in categories %}
+                  <option value="{{ category | downcase | escape }}">{{ category | escape }}</option>
+                {% endfor %}
+              </select>
+
+              <label class="sr-only" for="sort-filter">Sort recipes</label>
+              <select id="sort-filter" class="control-select">
+                <option value="title">Sort: A–Z</option>
+                <option value="protein">Sort: Highest Protein</option>
+                <option value="calories">Sort: Lowest Calories</option>
+                <option value="servings">Sort: Most Servings</option>
+              </select>
+            </div>
+          </div>
+
+          {% if categories.size > 0 %}
+            <div class="category-pills" role="group" aria-label="Quick category filter">
+              <button type="button" class="cat-pill" data-cat="" aria-pressed="true">
+                <span>All</span>
+                <span class="cat-pill-count">{{ recipes.size }}</span>
+              </button>
+              {% for category in categories %}
+                {% assign cat_lower = category | downcase %}
+                {% assign cat_count = 0 %}
+                {% for r in recipes %}
+                  {% assign r_cat = r.category | downcase %}
+                  {% if r_cat == cat_lower %}
+                    {% assign cat_count = cat_count | plus: 1 %}
+                  {% endif %}
+                {% endfor %}
+                <button type="button" class="cat-pill" data-cat="{{ cat_lower | escape }}" aria-pressed="false">
+                  <span>{{ category | escape }}</span>
+                  <span class="cat-pill-count">{{ cat_count }}</span>
+                </button>
               {% endfor %}
             </div>
           {% endif %}
+
+          {% if all_tags.size > 0 %}
+            <div class="tag-filter-row">
+              <span class="tag-filter-label">Tags:</span>
+              <div class="tag-list" aria-label="Filter by tags">
+                {% assign seen_tags = "" %}
+                {% for tag in all_tags %}
+                  {% assign clean_tag = tag | strip %}
+                  {% assign lower_tag = clean_tag | downcase %}
+                  {% assign tag_marker = "|" | append: lower_tag | append: "|" %}
+                  {% unless seen_tags contains tag_marker or clean_tag == "" %}
+                    {% assign seen_tags = seen_tags | append: tag_marker %}
+                    <button class="tag filter-tag" type="button" data-tag="{{ lower_tag | escape }}" aria-pressed="false">#{{ clean_tag | escape }}</button>
+                  {% endunless %}
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
         </section>
-        <p id="result-count" class="meta" aria-live="polite"></p>
-        <ul class="recipe-list">
+
+        <div class="results-toolbar">
+          <div class="results-status">
+            <p id="result-count" class="meta" aria-live="polite"></p>
+            <button type="button" id="clear-filters-btn" class="btn-clear-filters" hidden>
+              <span>Reset filters</span>
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+
+          <div class="view-toggle-group" role="group" aria-label="Recipe layout view">
+            <button type="button" id="view-grid-btn" class="view-btn" data-view="grid" aria-pressed="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>
+              </svg>
+              <span>Grid</span>
+            </button>
+            <button type="button" id="view-list-btn" class="view-btn" data-view="list" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
+              </svg>
+              <span>List</span>
+            </button>
+          </div>
+        </div>
+
+        <ul id="recipe-list" class="recipe-list" data-view="grid">
           {% for recipe in recipes %}
             {% assign description = recipe.description | default: recipe.excerpt | strip_html | strip_newlines | strip %}
             {% assign body_text = recipe.content | strip_html | strip_newlines | strip %}
             {% assign tag_text = recipe.tags | join: ' ' %}
             {% assign searchable = recipe.title | append: ' ' | append: recipe.category | append: ' ' | append: tag_text | append: ' ' | append: description | append: ' ' | append: body_text | downcase %}
-            <li class="recipe-item" data-search="{{ searchable | escape }}" data-category="{{ recipe.category | downcase | escape }}" data-tags="{{ recipe.tags | join: '|' | downcase | escape }}">
-              <div class="recipe-body">
-                <a class="recipe-link" href="{{ recipe.url | relative_url }}"><h2>{{ recipe.title | escape }}</h2></a>
-                <p class="meta">
-                  {% if recipe.category %}{{ recipe.category | escape }}{% endif %}
-                  {% if recipe.servings %}{% if recipe.category %} · {% endif %}Serves {{ recipe.servings | escape }}{% endif %}
-                  {% if recipe.prep_time %}{% if recipe.category or recipe.servings %} · {% endif %}Prep {{ recipe.prep_time | escape }}{% endif %}
-                  {% if recipe.cook_time %}{% if recipe.category or recipe.servings or recipe.prep_time %} · {% endif %}Cook {{ recipe.cook_time | escape }}{% endif %}
-                </p>
-                <p>{{ description }}</p>
-                {% if recipe.tags %}
-                  <div class="tag-list" aria-label="Recipe tags">
-                    {% for tag in recipe.tags %}<button class="tag recipe-tag" type="button" data-tag="{{ tag | strip | downcase | escape }}" aria-label="Filter by {{ tag | escape }}">{{ tag | escape }}</button>{% endfor %}
-                  </div>
-                {% endif %}
-              </div>
+            {% assign cat_lower = recipe.category | downcase %}
+            <li
+              class="recipe-item"
+              data-url="{{ recipe.url | relative_url }}"
+              data-title="{{ recipe.title | downcase | escape }}"
+              data-servings="{{ recipe.servings | default: 0 | escape }}"
+              data-search="{{ searchable | escape }}"
+              data-category="{{ cat_lower | escape }}"
+              data-tags="{{ recipe.tags | join: '|' | downcase | escape }}"
+            >
               {% if recipe.image %}
-                <a href="{{ recipe.url | relative_url }}" tabindex="-1" aria-hidden="true">
+                <a class="recipe-thumb-link" href="{{ recipe.url | relative_url }}" tabindex="-1" aria-hidden="true">
                   <img class="recipe-thumb" src="{{ recipe.image | relative_url }}" alt="{{ recipe.image_alt | default: recipe.title | escape }}" loading="lazy">
                 </a>
               {% endif %}
+
+              <div class="recipe-body">
+                <div class="recipe-card-top">
+                  {% if recipe.category %}
+                    <span class="category-badge" data-cat="{{ cat_lower | escape }}">{{ recipe.category | escape }}</span>
+                  {% else %}
+                    <span></span>
+                  {% endif %}
+                  <button
+                    type="button"
+                    class="fav-btn"
+                    data-recipe-url="{{ recipe.url | relative_url }}"
+                    aria-pressed="false"
+                    aria-label="Save {{ recipe.title | escape }} to favorites"
+                    title="Save recipe"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <a class="recipe-link" href="{{ recipe.url | relative_url }}">
+                  <h2>{{ recipe.title | escape }}</h2>
+                </a>
+
+                <p class="recipe-desc">{{ description }}</p>
+
+                <div class="recipe-specs" aria-label="Recipe details">
+                  {% if recipe.servings %}
+                    <span class="spec-pill" title="Servings">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                      </svg>
+                      <span>Serves {{ recipe.servings | escape }}</span>
+                    </span>
+                  {% endif %}
+                  {% if recipe.prep_time %}
+                    <span class="spec-pill" title="Prep time">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      <span>Prep {{ recipe.prep_time | escape }}</span>
+                    </span>
+                  {% endif %}
+                  {% if recipe.cook_time %}
+                    <span class="spec-pill" title="Cook time">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                      </svg>
+                      <span>Cook {{ recipe.cook_time | escape }}</span>
+                    </span>
+                  {% endif %}
+                </div>
+
+                {% if recipe.tags %}
+                  <div class="tag-list" aria-label="Recipe tags">
+                    {% for tag in recipe.tags %}
+                      <button class="tag recipe-tag" type="button" data-tag="{{ tag | strip | downcase | escape }}" aria-label="Filter by {{ tag | escape }}">#{{ tag | escape }}</button>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
             </li>
           {% endfor %}
         </ul>
-        <p id="no-results" class="empty" hidden>No recipes match those filters.</p>
+
+        <div id="no-results" class="empty-state" hidden>
+          <h3>No matching recipes found</h3>
+          <p>Try adjusting your search query or clearing some active filters.</p>
+          <button type="button" id="empty-reset-btn" class="btn-nav">Reset all filters</button>
+        </div>
+
         <script>
-          const searchInput = document.getElementById('recipe-search');
-          const categoryFilter = document.getElementById('category-filter');
-          const recipes = [...document.querySelectorAll('.recipe-item')];
-          const filterTags = [...document.querySelectorAll('.filter-tag')];
-          const resultCount = document.getElementById('result-count');
-          const noResults = document.getElementById('no-results');
-          const selectedTags = new Set();
+          (function () {
+            const searchInput = document.getElementById('recipe-search');
+            const searchClear = document.getElementById('search-clear');
+            const searchKbd = document.getElementById('search-kbd');
+            const categoryFilter = document.getElementById('category-filter');
+            const sortFilter = document.getElementById('sort-filter');
+            const recipeListEl = document.getElementById('recipe-list');
+            const recipes = [...document.querySelectorAll('.recipe-item')];
+            const filterTags = [...document.querySelectorAll('.filter-tag')];
+            const catPills = [...document.querySelectorAll('.cat-pill')];
+            const resultCount = document.getElementById('result-count');
+            const noResults = document.getElementById('no-results');
+            const clearFiltersBtn = document.getElementById('clear-filters-btn');
+            const emptyResetBtn = document.getElementById('empty-reset-btn');
+            const surpriseBtn = document.getElementById('surprise-btn');
+            const savedFilterBtn = document.getElementById('saved-filter-btn');
+            const savedCountBadge = document.getElementById('saved-count-badge');
+            const viewGridBtn = document.getElementById('view-grid-btn');
+            const viewListBtn = document.getElementById('view-list-btn');
+            const themeToggle = document.getElementById('theme-toggle');
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
 
-          function filterRecipes() {
-            const query = searchInput.value.trim().toLocaleLowerCase();
-            const category = categoryFilter.value;
-            let visible = 0;
-            recipes.forEach((recipe) => {
-              const tags = recipe.dataset.tags.toLocaleLowerCase().split('|').filter(Boolean);
-              const matchesSearch = recipe.dataset.search.includes(query);
-              const matchesCategory = !category || recipe.dataset.category === category;
-              const matchesTags = [...selectedTags].every((tag) => tags.includes(tag));
-              recipe.hidden = !(matchesSearch && matchesCategory && matchesTags);
-              if (!recipe.hidden) visible += 1;
+            const selectedTags = new Set();
+            let onlySaved = false;
+
+            // 1. Theme Toggle
+            function syncThemeIcons() {
+              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+              sunIcon.hidden = !isDark;
+              moonIcon.hidden = isDark;
+            }
+            syncThemeIcons();
+
+            themeToggle.addEventListener('click', () => {
+              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+              const next = isDark ? 'light' : 'dark';
+              if (next === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+              } else {
+                document.documentElement.removeAttribute('data-theme');
+              }
+              try {
+                localStorage.setItem('vojtovo_theme', next);
+              } catch (e) {}
+              syncThemeIcons();
             });
-            resultCount.textContent = `Showing ${visible} of ${recipes.length} recipes`;
-            noResults.hidden = visible !== 0;
-          }
 
-          filterTags.forEach((button) => {
-            button.addEventListener('click', () => {
-              const tag = button.dataset.tag.toLocaleLowerCase();
-              if (selectedTags.has(tag)) selectedTags.delete(tag);
-              else selectedTags.add(tag);
-              button.setAttribute('aria-pressed', String(selectedTags.has(tag)));
+            // 2. Auto-extract per-serving Calories & Protein from searchable content
+            recipes.forEach((recipe) => {
+              const searchTxt = recipe.dataset.search || '';
+              const calMatch = searchTxt.match(/calories\s+(\d+(?:\.\d+)?)\s*kcal/i);
+              const proMatch = searchTxt.match(/protein\s+(\d+(?:\.\d+)?)\s*g/i);
+              const specsContainer = recipe.querySelector('.recipe-specs');
+
+              if (calMatch) {
+                recipe.dataset.calories = calMatch[1];
+                if (specsContainer) {
+                  const pill = document.createElement('span');
+                  pill.className = 'spec-pill spec-nutrition';
+                  pill.title = 'Calories per serving';
+                  pill.textContent = `${calMatch[1]} kcal`;
+                  specsContainer.appendChild(pill);
+                }
+              } else {
+                recipe.dataset.calories = '9999';
+              }
+
+              if (proMatch) {
+                recipe.dataset.protein = proMatch[1];
+                if (specsContainer) {
+                  const pill = document.createElement('span');
+                  pill.className = 'spec-pill spec-nutrition';
+                  pill.title = 'Protein per serving';
+                  pill.textContent = `${proMatch[1]}g protein`;
+                  specsContainer.appendChild(pill);
+                }
+              } else {
+                recipe.dataset.protein = '0';
+              }
+            });
+
+            // 3. Favorites / Saved Recipes (localStorage)
+            function getSavedSet() {
+              try {
+                const raw = localStorage.getItem('vojtovo_saved_recipes');
+                return new Set(raw ? JSON.parse(raw) : []);
+              } catch (e) {
+                return new Set();
+              }
+            }
+
+            function saveSet(set) {
+              try {
+                localStorage.setItem('vojtovo_saved_recipes', JSON.stringify([...set]));
+              } catch (e) {}
+            }
+
+            function syncSavedUI() {
+              const saved = getSavedSet();
+              if (savedCountBadge) savedCountBadge.textContent = String(saved.size);
+              document.querySelectorAll('.fav-btn').forEach((btn) => {
+                const url = btn.dataset.recipeUrl;
+                btn.setAttribute('aria-pressed', String(saved.has(url)));
+              });
+            }
+
+            document.querySelectorAll('.fav-btn').forEach((btn) => {
+              btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const url = btn.dataset.recipeUrl;
+                const saved = getSavedSet();
+                if (saved.has(url)) saved.delete(url);
+                else saved.add(url);
+                saveSet(saved);
+                syncSavedUI();
+                if (onlySaved) filterRecipes();
+              });
+            });
+
+            if (savedFilterBtn) {
+              savedFilterBtn.addEventListener('click', () => {
+                onlySaved = !onlySaved;
+                savedFilterBtn.setAttribute('aria-pressed', String(onlySaved));
+                filterRecipes();
+              });
+            }
+
+            syncSavedUI();
+
+            // 4. View Switcher (Grid vs List)
+            function setViewMode(mode) {
+              recipeListEl.dataset.view = mode;
+              viewGridBtn.setAttribute('aria-pressed', String(mode === 'grid'));
+              viewListBtn.setAttribute('aria-pressed', String(mode === 'list'));
+              try {
+                localStorage.setItem('vojtovo_view_mode', mode);
+              } catch (e) {}
+            }
+
+            try {
+              const savedView = localStorage.getItem('vojtovo_view_mode');
+              if (savedView === 'list' || savedView === 'grid') setViewMode(savedView);
+            } catch (e) {}
+
+            viewGridBtn.addEventListener('click', () => setViewMode('grid'));
+            viewListBtn.addEventListener('click', () => setViewMode('list'));
+
+            // 5. Sorting
+            function sortRecipes() {
+              const mode = sortFilter.value;
+              const sorted = [...recipes].sort((a, b) => {
+                if (mode === 'protein') {
+                  return Number(b.dataset.protein || 0) - Number(a.dataset.protein || 0);
+                }
+                if (mode === 'calories') {
+                  return Number(a.dataset.calories || 9999) - Number(b.dataset.calories || 9999);
+                }
+                if (mode === 'servings') {
+                  return Number(b.dataset.servings || 0) - Number(a.dataset.servings || 0);
+                }
+                return (a.dataset.title || '').localeCompare(b.dataset.title || '');
+              });
+              sorted.forEach((el) => recipeListEl.appendChild(el));
+            }
+
+            sortFilter.addEventListener('change', sortRecipes);
+
+            // 6. Filtering & Search
+            function syncCategoryPills(catVal) {
+              catPills.forEach((pill) => {
+                pill.setAttribute('aria-pressed', String(pill.dataset.cat === catVal));
+              });
+            }
+
+            function filterRecipes() {
+              const query = searchInput.value.trim().toLocaleLowerCase();
+              const category = categoryFilter.value;
+              const saved = getSavedSet();
+              let visible = 0;
+
+              searchClear.hidden = query.length === 0;
+              if (searchKbd) searchKbd.hidden = query.length > 0;
+
+              recipes.forEach((recipe) => {
+                const tags = recipe.dataset.tags.toLocaleLowerCase().split('|').filter(Boolean);
+                const matchesSearch = recipe.dataset.search.includes(query);
+                const matchesCategory = !category || recipe.dataset.category === category;
+                const matchesTags = [...selectedTags].every((tag) => tags.includes(tag));
+                const matchesSaved = !onlySaved || saved.has(recipe.dataset.url);
+                recipe.hidden = !(matchesSearch && matchesCategory && matchesTags && matchesSaved);
+                if (!recipe.hidden) visible += 1;
+              });
+
+              resultCount.textContent = `Showing ${visible} of ${recipes.length} recipes`;
+              noResults.hidden = visible !== 0;
+
+              const hasActiveFilters = Boolean(query || category || selectedTags.size > 0 || onlySaved);
+              if (clearFiltersBtn) clearFiltersBtn.hidden = !hasActiveFilters;
+            }
+
+            function resetAllFilters() {
+              searchInput.value = '';
+              categoryFilter.value = '';
+              syncCategoryPills('');
+              selectedTags.clear();
+              filterTags.forEach((btn) => btn.setAttribute('aria-pressed', 'false'));
+              onlySaved = false;
+              if (savedFilterBtn) savedFilterBtn.setAttribute('aria-pressed', 'false');
+              filterRecipes();
+            }
+
+            catPills.forEach((pill) => {
+              pill.addEventListener('click', () => {
+                const cat = pill.dataset.cat;
+                categoryFilter.value = cat;
+                syncCategoryPills(cat);
+                filterRecipes();
+              });
+            });
+
+            categoryFilter.addEventListener('change', () => {
+              syncCategoryPills(categoryFilter.value);
               filterRecipes();
             });
-          });
-          document.querySelectorAll('.recipe-tag').forEach((button) => {
-            button.addEventListener('click', () => {
-              const targetTag = button.dataset.tag.toLocaleLowerCase();
-              const filterButton = filterTags.find((item) => item.dataset.tag.toLocaleLowerCase() === targetTag);
-              if (filterButton) filterButton.click();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            filterTags.forEach((button) => {
+              button.addEventListener('click', () => {
+                const tag = button.dataset.tag.toLocaleLowerCase();
+                if (selectedTags.has(tag)) selectedTags.delete(tag);
+                else selectedTags.add(tag);
+                button.setAttribute('aria-pressed', String(selectedTags.has(tag)));
+                filterRecipes();
+              });
             });
-          });
-          searchInput.addEventListener('input', filterRecipes);
-          categoryFilter.addEventListener('change', filterRecipes);
-          filterRecipes();
+
+            document.querySelectorAll('.recipe-tag').forEach((button) => {
+              button.addEventListener('click', () => {
+                const targetTag = button.dataset.tag.toLocaleLowerCase();
+                const filterButton = filterTags.find((item) => item.dataset.tag.toLocaleLowerCase() === targetTag);
+                if (filterButton) filterButton.click();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              });
+            });
+
+            searchInput.addEventListener('input', filterRecipes);
+            searchClear.addEventListener('click', () => {
+              searchInput.value = '';
+              searchInput.focus();
+              filterRecipes();
+            });
+
+            if (clearFiltersBtn) clearFiltersBtn.addEventListener('click', resetAllFilters);
+            if (emptyResetBtn) emptyResetBtn.addEventListener('click', resetAllFilters);
+
+            // Keyboard shortcut: press '/' to focus search
+            document.addEventListener('keydown', (e) => {
+              if (e.key === '/' && document.activeElement !== searchInput && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+                e.preventDefault();
+                searchInput.focus();
+              }
+            });
+
+            // 7. Surprise Me (Random Recipe)
+            if (surpriseBtn) {
+              surpriseBtn.addEventListener('click', () => {
+                const visibleRecipes = recipes.filter((r) => !r.hidden);
+                const pool = visibleRecipes.length > 0 ? visibleRecipes : recipes;
+                const pick = pool[Math.floor(Math.random() * pool.length)];
+                if (pick && pick.dataset.url) {
+                  window.location.href = pick.dataset.url;
+                }
+              });
+            }
+
+            // 8. Apply URL Query Parameters (?tag=..., ?category=..., ?q=...)
+            const params = new URLSearchParams(window.location.search);
+            const paramTag = params.get('tag');
+            const paramCat = params.get('category');
+            const paramQ = params.get('q');
+
+            if (paramQ) searchInput.value = paramQ;
+            if (paramCat) {
+              categoryFilter.value = paramCat.toLocaleLowerCase();
+              syncCategoryPills(categoryFilter.value);
+            }
+            if (paramTag) {
+              const cleanT = paramTag.toLocaleLowerCase();
+              const matchBtn = filterTags.find((b) => b.dataset.tag.toLocaleLowerCase() === cleanT);
+              if (matchBtn) {
+                selectedTags.add(cleanT);
+                matchBtn.setAttribute('aria-pressed', 'true');
+              }
+            }
+
+            filterRecipes();
+          })();
         </script>
       {% endif %}
     </main>
+
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <span><strong>Vojtovo Cookbook</strong> · Plant-based kitchen notebook &amp; interactive recipe archive</span>
+        <span>Tip: Press <kbd>/</kbd> anywhere to search recipes</span>
+      </div>
+    </footer>
   </body>
 </html>

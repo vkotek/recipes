@@ -1,4 +1,5 @@
-title: Recipes
+title: Vojtovo Cookbook
+description: A modern plant-based recipe collection and interactive kitchen companion.
 markdown: kramdown
 collections:
   recipes:

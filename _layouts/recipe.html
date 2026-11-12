@@ -3,96 +3,209 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ page.title | escape }} · Recipes</title>
+    <title>{{ page.title | escape }} · {{ site.title | default: "Vojtovo Cookbook" }}</title>
     <meta name="description" content="{{ page.description | default: page.title | escape }}">
-    <style>
-      :root { color-scheme: light; --ink: #29251f; --muted: #71695f; --paper: #fffdf8; --line: #e9e1d5; --accent: #85552f; --chip: #f3eadc; --active-bg: #fdf6ec; }
-      * { box-sizing: border-box; }
-      body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.7 system-ui, sans-serif; }
-      header { padding: 2rem 1.25rem; background: #f3eadc; border-bottom: 1px solid var(--line); }
-      header, main { padding-left: max(1.25rem, calc((100% - 760px) / 2)); padding-right: max(1.25rem, calc((100% - 760px) / 2)); }
-      a { color: var(--accent); }
-      header a { font-weight: 650; }
-      h1 { margin: .75rem 0 .25rem; font-size: clamp(2rem, 6vw, 3rem); line-height: 1.15; }
-      .meta { color: var(--muted); margin: .35rem 0; }
-      .meta a { font-weight: 500; }
-      main { padding-top: 1.5rem; padding-bottom: 4rem; }
-      .hero-image { display: block; width: 100%; max-height: 28rem; object-fit: cover; border-radius: 1rem; margin: 0 0 2rem; }
-      .tags { display: flex; flex-wrap: wrap; gap: .45rem; margin: 1rem 0 0; }
-      .tag { padding: .2rem .65rem; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); color: var(--accent); font-size: .85rem; }
-      .kitchen-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem 1rem; margin-bottom: 1.5rem; background: var(--chip); border: 1px solid var(--line); border-radius: .75rem; max-width: 68ch; }
-      .toolbar-group { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
-      .toolbar-label { font-size: .88rem; font-weight: 600; color: var(--muted); margin-right: .2rem; }
-      .btn-tool { padding: .3rem .65rem; border: 1px solid var(--line); border-radius: .45rem; background: white; color: var(--ink); font: inherit; font-size: .88rem; font-weight: 500; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
-      .btn-tool:hover { border-color: var(--accent); }
-      .btn-tool:focus-visible, .check-item:focus-visible, .step-item:focus-visible { outline: 3px solid #d5ad7f; outline-offset: 2px; }
-      .btn-tool[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: white; }
-      .btn-reset { background: transparent; border-color: transparent; color: var(--accent); text-decoration: underline; padding: .25rem .4rem; }
-      .wake-status { font-size: .8rem; color: var(--muted); width: 100%; margin: -.25rem 0 0; }
-      .recipe-content { max-width: 68ch; }
-      .recipe-content h2 { margin-top: 1.8rem; line-height: 1.25; }
-      .recipe-content h3 { margin: 1.4rem 0 .35rem; }
-      .recipe-content ul, .recipe-content ol { padding-left: 1.5rem; }
-      .recipe-content li + li { margin-top: .35rem; }
-      .recipe-content ul.interactive-list { list-style: none; padding-left: 0; }
-      .check-item { display: flex; align-items: baseline; gap: .65rem; padding: .3rem .5rem; margin: 0 -.5rem; border-radius: .45rem; cursor: pointer; user-select: none; transition: background .12s, color .12s; }
-      .check-item:hover { background: var(--active-bg); }
-      .check-box { flex-shrink: 0; width: 1.05rem; height: 1.05rem; border: 1.5px solid var(--accent); border-radius: .25rem; display: inline-flex; align-items: center; justify-content: center; background: white; transform: translateY(2px); font-size: .75rem; color: white; }
-      .check-item[aria-checked="true"] { color: var(--muted); text-decoration: line-through; }
-      .check-item[aria-checked="true"] .check-box { background: var(--accent); }
-      .check-item[aria-checked="true"] .check-box::after { content: "✓"; }
-      .scaled-num { font-weight: 600; color: var(--accent); }
-      .check-item[aria-checked="true"] .scaled-num { color: inherit; }
-      .step-item { cursor: pointer; padding: .25rem .4rem; margin: 0 -.4rem; border-radius: .45rem; transition: background .12s, color .12s; }
-      .step-item:hover { background: var(--active-bg); }
-      .step-item[aria-checked="true"] { color: var(--muted); text-decoration: line-through; }
-      .recipe-content img { max-width: 100%; height: auto; border-radius: .75rem; }
-      .recipe-content blockquote { margin-left: 0; padding: .25rem 1rem; border-left: 3px solid var(--line); color: var(--muted); }
-      .recipe-content table { width: 100%; max-width: 34rem; border-collapse: collapse; margin: .75rem 0 1.25rem; font-size: .95rem; font-variant-numeric: tabular-nums; background: white; border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; }
-      .recipe-content th, .recipe-content td { padding: .5rem .85rem; border-bottom: 1px solid var(--line); }
-      .recipe-content th { background: var(--chip); color: var(--ink); font-weight: 650; text-align: left; }
-      .recipe-content tr:last-child td { border-bottom: none; }
-      @media print {
-        header { padding: 0 0 1rem; background: white; }
-        header > a, .kitchen-toolbar { display: none !important; }
-        header, main { padding-left: 0; padding-right: 0; }
-        .hero-image { max-height: 16rem; }
-        .check-box { border-color: #999; }
-      }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <script>
+      (function () {
+        try {
+          const savedTheme = localStorage.getItem('vojtovo_theme');
+          const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
-    <header>
-      <a href="{{ '/' | relative_url }}">← All recipes</a>
-      <h1>{{ page.title | escape }}</h1>
-      <p class="meta">
-        {% assign has_meta = false %}
-        {% if page.category %}{{ page.category | escape }}{% assign has_meta = true %}{% endif %}
-        {% if page.servings %}{% if has_meta %} · {% endif %}<span id="recipe-servings" data-base-servings="{{ page.servings | escape }}">Serves {{ page.servings | escape }}</span>{% assign has_meta = true %}{% endif %}
-        {% if page.prep_time %}{% if has_meta %} · {% endif %}Prep {{ page.prep_time | escape }}{% assign has_meta = true %}{% endif %}
-        {% if page.cook_time %}{% if has_meta %} · {% endif %}Cook {{ page.cook_time | escape }}{% assign has_meta = true %}{% endif %}
-        {% if page.source %}{% if has_meta %} · {% endif %}<a href="{{ page.source | escape }}" target="_blank" rel="noopener">Original source ↗</a>{% endif %}
-      </p>
-      {% if page.tags %}<div class="tags">{% for tag in page.tags %}<span class="tag">{{ tag | escape }}</span>{% endfor %}</div>{% endif %}
+    <nav class="site-nav" aria-label="Recipe navigation">
+      <div class="site-nav-inner">
+        <a class="brand-link" href="{{ '/' | relative_url }}">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 0 6h-1v5a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-5H7a3 3 0 0 1 0-6h1V6a4 4 0 0 1 4-4Z"/>
+              <path d="M8 16h8"/>
+            </svg>
+          </span>
+          <span>Vojtovo Cookbook</span>
+        </a>
+
+        <div class="nav-actions">
+          <button
+            type="button"
+            id="recipe-fav-btn"
+            class="btn-nav"
+            data-recipe-url="{{ page.url | relative_url }}"
+            aria-pressed="false"
+            title="Save recipe to favorites"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            </svg>
+            <span id="recipe-fav-label">Save</span>
+          </button>
+
+          <button type="button" id="share-recipe-btn" class="btn-nav" title="Copy link to recipe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>
+            </svg>
+            <span id="share-recipe-label">Share</span>
+          </button>
+
+          <button type="button" id="print-recipe-btn" class="btn-nav btn-icon-only" aria-label="Print recipe" title="Print recipe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/>
+            </svg>
+          </button>
+
+          <button type="button" id="theme-toggle" class="btn-nav btn-icon-only" aria-label="Toggle color theme" title="Toggle light/dark mode">
+            <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden>
+              <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+            </svg>
+            <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <header class="recipe-hero">
+      <div class="recipe-hero-inner">
+        <div class="recipe-hero-top">
+          <a class="back-link" href="{{ '/' | relative_url }}">← All recipes</a>
+          {% if page.category %}
+            {% assign cat_lower = page.category | downcase %}
+            <a class="category-badge" data-cat="{{ cat_lower | escape }}" href="{{ '/' | relative_url }}?category={{ cat_lower | url_encode }}">
+              {{ page.category | escape }}
+            </a>
+          {% endif %}
+        </div>
+
+        <h1>{{ page.title | escape }}</h1>
+
+        {% if page.description %}
+          <p class="recipe-lead">{{ page.description | escape }}</p>
+        {% endif %}
+
+        <div class="recipe-meta-grid" aria-label="Recipe overview">
+          {% if page.servings %}
+            <div class="meta-card">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <div class="meta-card-content">
+                <span class="meta-card-label">Yield</span>
+                <span id="recipe-servings" class="meta-card-value" data-base-servings="{{ page.servings | escape }}">Serves {{ page.servings | escape }}</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if page.prep_time %}
+            <div class="meta-card">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <div class="meta-card-content">
+                <span class="meta-card-label">Prep Time</span>
+                <span class="meta-card-value">{{ page.prep_time | escape }}</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if page.cook_time %}
+            <div class="meta-card">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+              </svg>
+              <div class="meta-card-content">
+                <span class="meta-card-label">Cook Time</span>
+                <span class="meta-card-value">{{ page.cook_time | escape }}</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if page.source %}
+            <div class="meta-card">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>
+              </svg>
+              <div class="meta-card-content">
+                <span class="meta-card-label">Reference</span>
+                <span class="meta-card-value"><a href="{{ page.source | escape }}" target="_blank" rel="noopener">Original source ↗</a></span>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        {% if page.tags %}
+          <div class="tags" aria-label="Recipe tags">
+            {% for tag in page.tags %}
+              <a class="tag" href="{{ '/' | relative_url }}?tag={{ tag | strip | downcase | url_encode }}">#{{ tag | escape }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
     </header>
-    <main>
-      {% if page.image %}<img class="hero-image" src="{{ page.image | relative_url }}" alt="{{ page.image_alt | default: page.title | escape }}">{% endif %}
+
+    <main class="container">
+      {% if page.image %}
+        <img class="hero-image" src="{{ page.image | relative_url }}" alt="{{ page.image_alt | default: page.title | escape }}">
+      {% endif %}
+
       <section class="kitchen-toolbar" aria-label="Cooking tools">
         <div class="toolbar-group" role="group" aria-label="Portion multiplier">
           <span class="toolbar-label">Scale:</span>
-          <button type="button" class="btn-tool scale-btn" data-scale="0.5" aria-pressed="false">0.5×</button>
-          <button type="button" class="btn-tool scale-btn" data-scale="1" aria-pressed="true">1×</button>
-          <button type="button" class="btn-tool scale-btn" data-scale="2" aria-pressed="false">2×</button>
-          <button type="button" class="btn-tool scale-btn" data-scale="3" aria-pressed="false">3×</button>
+          <div class="scale-pill-group">
+            <button type="button" class="btn-tool scale-btn" data-scale="0.5" aria-pressed="false">0.5×</button>
+            <button type="button" class="btn-tool scale-btn" data-scale="1" aria-pressed="true">1×</button>
+            <button type="button" class="btn-tool scale-btn" data-scale="2" aria-pressed="false">2×</button>
+            <button type="button" class="btn-tool scale-btn" data-scale="3" aria-pressed="false">3×</button>
+          </div>
         </div>
+
         <div class="toolbar-group">
+          <div id="cooking-progress-pill" class="progress-pill" title="Checked ingredients and steps">
+            <div class="progress-bar-track" aria-hidden="true">
+              <div id="progress-bar-fill" class="progress-bar-fill"></div>
+            </div>
+            <span id="progress-text">0 / 0 checked</span>
+          </div>
           <button type="button" id="reset-checks" class="btn-tool btn-reset" hidden>Reset checks</button>
           <button type="button" id="wake-toggle" class="btn-tool" aria-pressed="false">☀️ Cook Mode</button>
         </div>
+
         <p id="wake-status" class="wake-status" aria-live="polite" hidden></p>
       </section>
+
       <div class="recipe-content" id="recipe-content">{{ content }}</div>
     </main>
+
+    <!-- Floating Kitchen Timer Dock -->
+    <aside id="timer-dock" class="timer-dock" aria-live="polite" hidden>
+      <div class="timer-display">
+        <span id="timer-label" class="timer-label">Kitchen Timer</span>
+        <span id="timer-clock" class="timer-clock">00:00</span>
+      </div>
+      <div class="timer-controls">
+        <button type="button" id="timer-pause-btn" class="timer-btn">Pause</button>
+        <button type="button" id="timer-add-btn" class="timer-btn" title="Add 1 minute">+1m</button>
+        <button type="button" id="timer-close-btn" class="timer-btn" aria-label="Dismiss timer">×</button>
+      </div>
+    </aside>
+
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <span><strong>Vojtovo Cookbook</strong> · <a href="{{ '/' | relative_url }}">Browse all recipes</a></span>
+        <span>Tap any ingredient or step to mark progress · Tap inline times to start a timer</span>
+      </div>
+    </footer>
+
     <script>
       (function () {
         const contentEl = document.getElementById('recipe-content');
@@ -101,25 +214,182 @@
         const scaleBtns = [...document.querySelectorAll('.scale-btn')];
         const wakeToggle = document.getElementById('wake-toggle');
         const wakeStatus = document.getElementById('wake-status');
+        const progressText = document.getElementById('progress-text');
+        const progressFill = document.getElementById('progress-bar-fill');
+        const progressPill = document.getElementById('cooking-progress-pill');
 
-        // 1. Identify ingredient lists (under Ingredients / Suroviny headings, or fallback to all ul)
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('theme-icon-sun');
+        const moonIcon = document.getElementById('theme-icon-moon');
+        const favBtn = document.getElementById('recipe-fav-btn');
+        const favLabel = document.getElementById('recipe-fav-label');
+        const shareBtn = document.getElementById('share-recipe-btn');
+        const shareLabel = document.getElementById('share-recipe-label');
+        const printBtn = document.getElementById('print-recipe-btn');
+
+        // 0. Theme, Save, Share, Print
+        function syncThemeIcons() {
+          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          sunIcon.hidden = !isDark;
+          moonIcon.hidden = isDark;
+        }
+        syncThemeIcons();
+
+        themeToggle.addEventListener('click', () => {
+          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          const next = isDark ? 'light' : 'dark';
+          if (next === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+          else document.documentElement.removeAttribute('data-theme');
+          try {
+            localStorage.setItem('vojtovo_theme', next);
+          } catch (e) {}
+          syncThemeIcons();
+        });
+
+        if (favBtn) {
+          const recipeUrl = favBtn.dataset.recipeUrl;
+          function getSavedSet() {
+            try {
+              const raw = localStorage.getItem('vojtovo_saved_recipes');
+              return new Set(raw ? JSON.parse(raw) : []);
+            } catch (e) {
+              return new Set();
+            }
+          }
+          function syncFav() {
+            const isSaved = getSavedSet().has(recipeUrl);
+            favBtn.setAttribute('aria-pressed', String(isSaved));
+            if (favLabel) favLabel.textContent = isSaved ? 'Saved' : 'Save';
+          }
+          syncFav();
+          favBtn.addEventListener('click', () => {
+            const saved = getSavedSet();
+            if (saved.has(recipeUrl)) saved.delete(recipeUrl);
+            else saved.add(recipeUrl);
+            try {
+              localStorage.setItem('vojtovo_saved_recipes', JSON.stringify([...saved]));
+            } catch (e) {}
+            syncFav();
+          });
+        }
+
+        if (shareBtn) {
+          shareBtn.addEventListener('click', async () => {
+            if (navigator.share) {
+              try {
+                await navigator.share({ title: document.title, url: window.location.href });
+                return;
+              } catch (e) {}
+            }
+            try {
+              await navigator.clipboard.writeText(window.location.href);
+              if (shareLabel) {
+                shareLabel.textContent = 'Copied!';
+                setTimeout(() => { shareLabel.textContent = 'Share'; }, 1800);
+              }
+            } catch (e) {}
+          });
+        }
+
+        if (printBtn) {
+          printBtn.addEventListener('click', () => window.print());
+        }
+
+        // 1. Organize Markdown Content into Two-Column Kitchen Workspace
+        const children = [...contentEl.children];
+        const firstHeadingIdx = children.findIndex((el) => /^H[23]$/.test(el.tagName));
+
+        if (firstHeadingIdx !== -1) {
+          const introNodes = children.slice(0, firstHeadingIdx);
+          const sectionNodes = children.slice(firstHeadingIdx);
+
+          const sections = [];
+          let currentSection = null;
+
+          sectionNodes.forEach((node) => {
+            if (/^H[23]$/.test(node.tagName)) {
+              const headingText = node.textContent.trim();
+              let type = 'general';
+              if (/ingredients|suroviny/i.test(headingText)) type = 'ingredients';
+              else if (/equipment|vybaven/i.test(headingText)) type = 'equipment';
+              else if (/method|postup|instructions|directions/i.test(headingText)) type = 'method';
+              else if (/nutritionist/i.test(headingText)) type = 'nutritionist';
+              else if (/nutrition/i.test(headingText)) type = 'nutrition';
+              else if (/notes|storage|pozn/i.test(headingText)) type = 'notes';
+
+              currentSection = document.createElement('section');
+              currentSection.className = `recipe-section-card section-${type}`;
+              currentSection.dataset.sectionType = type;
+              currentSection.appendChild(node);
+              sections.push(currentSection);
+            } else if (currentSection) {
+              currentSection.appendChild(node);
+            }
+          });
+
+          contentEl.innerHTML = '';
+
+          if (introNodes.length > 0) {
+            const introBox = document.createElement('div');
+            introBox.className = 'recipe-intro';
+            introNodes.forEach((n) => introBox.appendChild(n));
+            contentEl.appendChild(introBox);
+          }
+
+          const workspace = document.createElement('div');
+          workspace.className = 'recipe-workspace';
+          const sidebar = document.createElement('div');
+          sidebar.className = 'recipe-sidebar';
+          const mainCol = document.createElement('div');
+          mainCol.className = 'recipe-main';
+
+          sections.forEach((sec) => {
+            const t = sec.dataset.sectionType;
+            if (t === 'ingredients' || t === 'equipment') {
+              sidebar.appendChild(sec);
+            } else {
+              mainCol.appendChild(sec);
+            }
+          });
+
+          // Ensure ingredients come before equipment in the sidebar
+          const ingSec = sidebar.querySelector('.section-ingredients');
+          const eqSec = sidebar.querySelector('.section-equipment');
+          if (ingSec && eqSec && sidebar.firstElementChild === eqSec) {
+            sidebar.insertBefore(ingSec, eqSec);
+          }
+
+          if (sidebar.children.length > 0 && mainCol.children.length > 0) {
+            workspace.appendChild(sidebar);
+            workspace.appendChild(mainCol);
+            contentEl.appendChild(workspace);
+          } else {
+            sections.forEach((sec) => contentEl.appendChild(sec));
+          }
+        }
+
+        // 2. Identify Ingredient Lists & Tokenize Numbers for Scaling
         const headings = [...contentEl.querySelectorAll('h2, h3')];
         const ingredientHeadings = headings.filter((h) => /ingredients|suroviny/i.test(h.textContent));
         const ingredientLists = [];
 
         if (ingredientHeadings.length > 0) {
           ingredientHeadings.forEach((heading) => {
-            let sibling = heading.nextElementSibling;
-            while (sibling && !/^H[1-3]$/.test(sibling.tagName)) {
-              if (sibling.tagName === 'UL') ingredientLists.push(sibling);
-              sibling = sibling.nextElementSibling;
+            const parentSec = heading.closest('.section-ingredients');
+            if (parentSec) {
+              ingredientLists.push(...parentSec.querySelectorAll('ul'));
+            } else {
+              let sibling = heading.nextElementSibling;
+              while (sibling && !/^H[1-3]$/.test(sibling.tagName)) {
+                if (sibling.tagName === 'UL') ingredientLists.push(sibling);
+                sibling = sibling.nextElementSibling;
+              }
             }
           });
         } else {
           ingredientLists.push(...contentEl.querySelectorAll('ul'));
         }
 
-        // Tokenize numbers in ingredient text nodes so we can scale them cleanly
         const numPattern = /(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?)(?!\s*-?(?:oz|inch|cm\b)|°)/gi;
 
         function parseQuantity(str) {
@@ -190,15 +460,26 @@
           textNode.parentNode.replaceChild(frag, textNode);
         }
 
-        function updateResetVisibility() {
-          const anyChecked = contentEl.querySelector('[aria-checked="true"]') !== null;
-          resetBtn.hidden = !anyChecked;
+        // 3. Checkable Ingredients & Steps + Progress Bar
+        function updateProgressAndReset() {
+          const allCheckables = contentEl.querySelectorAll('[role="checkbox"]');
+          const checkedItems = contentEl.querySelectorAll('[aria-checked="true"]');
+          const total = allCheckables.length;
+          const done = checkedItems.length;
+
+          resetBtn.hidden = done === 0;
+          if (progressPill && progressText && progressFill) {
+            progressPill.hidden = total === 0;
+            progressText.textContent = `${done} / ${total} checked`;
+            const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+            progressFill.style.width = `${pct}%`;
+          }
         }
 
         function toggleCheckable(el) {
           const checked = el.getAttribute('aria-checked') === 'true';
           el.setAttribute('aria-checked', String(!checked));
-          updateResetVisibility();
+          updateProgressAndReset();
         }
 
         ingredientLists.forEach((ul) => {
@@ -211,7 +492,7 @@
 
             li.classList.add('check-item');
             li.setAttribute('role', 'checkbox');
-            li.setAttribute(' aria-checked'.trim(), 'false');
+            li.setAttribute('aria-checked', 'false');
             li.setAttribute('tabindex', '0');
 
             const box = document.createElement('span');
@@ -236,17 +517,79 @@
           });
         });
 
-        // Make method steps checkable too
+        // 4. Inline Step Timers + Checkable Method Steps
+        const timePattern = /\b(\d+(?:\s*[–-]\s*\d+)?)\s*(minutes?|mins?|minuty|minut|seconds?|secs?|sekund|hours?|hrs?|hodin(?:y|u)?)\b/gi;
+
+        function parseDurationToSeconds(numPart, unitPart) {
+          const nums = numPart.split(/[–-]/).map((s) => Number(s.trim())).filter((n) => !Number.isNaN(n));
+          const val = nums[0] || 1;
+          const u = unitPart.toLowerCase();
+          if (u.startsWith('h')) return val * 3600;
+          if (u.startsWith('s')) return val;
+          return val * 60;
+        }
+
+        function injectStepTimers(container) {
+          const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+          const nodes = [];
+          while (walker.nextNode()) nodes.push(walker.currentNode);
+
+          nodes.forEach((textNode) => {
+            const text = textNode.nodeValue;
+            if (!timePattern.test(text)) return;
+            timePattern.lastIndex = 0;
+
+            const frag = document.createDocumentFragment();
+            let lastIdx = 0;
+            let match;
+            while ((match = timePattern.exec(text)) !== null) {
+              const fullMatch = match[0];
+              const numStr = match[1];
+              const unitStr = match[2];
+              const seconds = parseDurationToSeconds(numStr, unitStr);
+
+              if (match.index > lastIdx) {
+                frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index + fullMatch.length)));
+              } else {
+                frag.appendChild(document.createTextNode(fullMatch));
+              }
+
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'inline-timer-btn';
+              btn.dataset.seconds = String(seconds);
+              btn.dataset.label = fullMatch;
+              btn.title = `Start ${fullMatch} timer`;
+              btn.textContent = `⏱️ Timer`;
+              frag.appendChild(btn);
+
+              lastIdx = timePattern.lastIndex;
+            }
+            if (lastIdx < text.length) {
+              frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+            }
+            textNode.parentNode.replaceChild(frag, textNode);
+          });
+        }
+
         contentEl.querySelectorAll('ol li').forEach((li) => {
           li.classList.add('step-item');
           li.setAttribute('role', 'checkbox');
           li.setAttribute('aria-checked', 'false');
           li.setAttribute('tabindex', '0');
+
+          const bodyWrap = document.createElement('div');
+          bodyWrap.className = 'step-body';
+          while (li.firstChild) bodyWrap.appendChild(li.firstChild);
+          injectStepTimers(bodyWrap);
+          li.appendChild(bodyWrap);
+
           li.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A') return;
+            if (e.target.tagName === 'A' || e.target.closest('.inline-timer-btn')) return;
             toggleCheckable(li);
           });
           li.addEventListener('keydown', (e) => {
+            if (e.target.closest('.inline-timer-btn')) return;
             if (e.key === ' ' || e.key === 'Enter') {
               e.preventDefault();
               toggleCheckable(li);
@@ -258,10 +601,44 @@
           contentEl.querySelectorAll('[aria-checked="true"]').forEach((el) => {
             el.setAttribute('aria-checked', 'false');
           });
-          updateResetVisibility();
+          updateProgressAndReset();
         });
 
-        // 2. Portion Scaling
+        updateProgressAndReset();
+
+        // 5. Enhance Nutrition Section with Macro Summary Pills
+        const nutritionSection = contentEl.querySelector('.section-nutrition');
+        if (nutritionSection) {
+          const table = nutritionSection.querySelector('table');
+          if (table) {
+            const rows = [...table.querySelectorAll('tbody tr')];
+            const macros = [];
+            rows.forEach((tr) => {
+              const cells = tr.querySelectorAll('td');
+              if (cells.length >= 2) {
+                const label = cells[0].textContent.trim();
+                const perServing = cells[1].textContent.trim();
+                if (/calories|protein|carbohydrates|fiber|fat/i.test(label)) {
+                  macros.push({ label: label.replace(/carbohydrates/i, 'Carbs'), val: perServing });
+                }
+              }
+            });
+            if (macros.length > 0) {
+              const grid = document.createElement('div');
+              grid.className = 'macro-summary-grid';
+              grid.setAttribute('aria-label', 'Per serving macro summary');
+              macros.forEach((m) => {
+                const pill = document.createElement('div');
+                pill.className = 'macro-pill';
+                pill.innerHTML = `<span class="macro-pill-val">${m.val}</span><span class="macro-pill-label">${m.label} / serving</span>`;
+                grid.appendChild(pill);
+              });
+              nutritionSection.insertBefore(grid, table);
+            }
+          }
+        }
+
+        // 6. Portion Scaling
         scaleBtns.forEach((btn) => {
           btn.addEventListener('click', () => {
             const scale = Number(btn.dataset.scale);
@@ -290,20 +667,122 @@
           });
         });
 
-        // 3. Cook Mode (Screen Wake Lock API)
+        // 7. Kitchen Timer Dock Logic
+        const timerDock = document.getElementById('timer-dock');
+        const timerLabelEl = document.getElementById('timer-label');
+        const timerClockEl = document.getElementById('timer-clock');
+        const timerPauseBtn = document.getElementById('timer-pause-btn');
+        const timerAddBtn = document.getElementById('timer-add-btn');
+        const timerCloseBtn = document.getElementById('timer-close-btn');
+
+        let timerRemaining = 0;
+        let timerInterval = null;
+        let timerPaused = false;
+
+        function formatClock(sec) {
+          const m = Math.floor(sec / 60);
+          const s = sec % 60;
+          return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function playTimerChime() {
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            [523.25, 659.25, 783.99].forEach((freq, i) => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.value = freq;
+              gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.18);
+              gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.5);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start(ctx.currentTime + i * 0.18);
+              osc.stop(ctx.currentTime + i * 0.18 + 0.52);
+            });
+          } catch (e) {}
+        }
+
+        function startKitchenTimer(seconds, label) {
+          if (timerInterval) clearInterval(timerInterval);
+          timerRemaining = seconds;
+          timerPaused = false;
+          timerDock.hidden = false;
+          timerDock.classList.remove('is-finished');
+          timerLabelEl.textContent = `Timer · ${label}`;
+          timerClockEl.textContent = formatClock(timerRemaining);
+          timerPauseBtn.textContent = 'Pause';
+
+          timerInterval = setInterval(() => {
+            if (timerPaused) return;
+            timerRemaining -= 1;
+            if (timerRemaining <= 0) {
+              timerRemaining = 0;
+              clearInterval(timerInterval);
+              timerInterval = null;
+              timerClockEl.textContent = '00:00';
+              timerLabelEl.textContent = `Done! (${label})`;
+              timerDock.classList.add('is-finished');
+              playTimerChime();
+            } else {
+              timerClockEl.textContent = formatClock(timerRemaining);
+            }
+          }, 1000);
+        }
+
+        contentEl.addEventListener('click', (e) => {
+          const timerBtn = e.target.closest('.inline-timer-btn');
+          if (!timerBtn) return;
+          e.stopPropagation();
+          const secs = Number(timerBtn.dataset.seconds || 60);
+          const lbl = timerBtn.dataset.label || 'Step';
+          startKitchenTimer(secs, lbl);
+        });
+
+        if (timerPauseBtn) {
+          timerPauseBtn.addEventListener('click', () => {
+            if (timerRemaining <= 0) return;
+            timerPaused = !timerPaused;
+            timerPauseBtn.textContent = timerPaused ? 'Resume' : 'Pause';
+          });
+        }
+
+        if (timerAddBtn) {
+          timerAddBtn.addEventListener('click', () => {
+            timerRemaining += 60;
+            timerDock.classList.remove('is-finished');
+            timerClockEl.textContent = formatClock(timerRemaining);
+            if (!timerInterval) {
+              startKitchenTimer(timerRemaining, 'Extended');
+            }
+          });
+        }
+
+        if (timerCloseBtn) {
+          timerCloseBtn.addEventListener('click', () => {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            timerDock.hidden = true;
+            timerDock.classList.remove('is-finished');
+          });
+        }
+
+        // 8. Cook Mode (Screen Wake Lock API + High-Legibility Mode)
         let wakeLock = null;
         let cookModeWanted = false;
 
         async function requestWakeLock() {
+          document.body.classList.add('cook-mode-active');
+          wakeToggle.setAttribute('aria-pressed', 'true');
+          wakeToggle.textContent = '☀️ Cook Mode: On';
+
           if (!('wakeLock' in navigator)) {
-            wakeStatus.textContent = 'Screen wake lock is not supported on this browser.';
+            wakeStatus.textContent = 'Focus mode active (screen wake lock not supported on this browser).';
             wakeStatus.hidden = false;
             return;
           }
           try {
             wakeLock = await navigator.wakeLock.request('screen');
-            wakeToggle.setAttribute('aria-pressed', 'true');
-            wakeToggle.textContent = '☀️ Cook Mode: On';
             wakeStatus.hidden = true;
             wakeLock.addEventListener('release', () => {
               if (!cookModeWanted) {
@@ -312,17 +791,15 @@
               }
             });
           } catch (err) {
-            wakeStatus.textContent = 'Could not keep screen awake on this device.';
+            wakeStatus.textContent = 'Focus mode active (could not lock screen wake on this device).';
             wakeStatus.hidden = false;
-            cookModeWanted = false;
-            wakeToggle.setAttribute('aria-pressed', 'false');
-            wakeToggle.textContent = '☀️ Cook Mode';
           }
         }
 
         wakeToggle.addEventListener('click', async () => {
           if (cookModeWanted) {
             cookModeWanted = false;
+            document.body.classList.remove('cook-mode-active');
             if (wakeLock) {
               await wakeLock.release();
               wakeLock = null;
