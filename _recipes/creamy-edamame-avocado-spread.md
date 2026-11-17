@@ -1,7 +1,7 @@
 ---
 title: "Creamy Edamame & Avocado Spread"
 description: A quick, protein-rich plant-based spread perfect for toast, crackers, or veggie sticks.
-category: Lunch
+category: Snack
 tags:
   - vegan
   - spread
